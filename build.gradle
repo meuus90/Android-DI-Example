@@ -1,0 +1,59 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext.kotlin_version = '1.3.21'
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+ext {
+    // Set Android Version
+    compileSdkVersion = 28
+    buildToolsVersion = '28.0.3'
+    minSdkVersion = 18
+    targetSdkVersion = 28
+
+    // Set Libraries Version
+    guava = '18.0'
+    rxJava = "2.1.15"
+    rxkotlin = "2.2.0"
+    rxAndroid = "2.0.2"
+
+//    fastSdkVersion = 21
+//    firebase_core = "16.0.3"
+//    firebase_invite = "16.0.3"
+//    firebase_msg = "17.3.0"
+//    firebase_ads = "15.0.1"
+//    googleSupport_map = "15.0.1"
+//    supportLibVersion = "28.0.0"
+//    gson = "2.8.5"
+//    glide = "4.7.1"
+//    retrofit2 = "2.3.0"
+//    okhttp3 = "3.10.0"
+//    junitVersion = '4.12'
+//    mockitoVersion = '2.15.0'
+//    robolectricVersion = '4.0.2'
+//    powerMockito = '1.6.2'
+//    hamcrestVersion = '1.3'
+//    runnerVersion = '0.5'
+//    rulesVersion = '0.5'
+//    espressoVersion = '3.0.2'
+//    room_version = '1.1.1'
+}
