@@ -1,4 +1,4 @@
-package com.example.meuuslibs2;
+package com.libs.meuuslibs;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.example.meuuslibs2;
+package com.libs.meuuslibs;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
