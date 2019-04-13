@@ -10,7 +10,7 @@ import com.libs.meuuslibs.R
 import kotlinx.android.synthetic.main.widget_meu_edit_text.view.*
 
 
-class MEUEditText : RelativeLayout {
+class MeUEditText : RelativeLayout {
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         initView(context)
         getAttrs(attrs, defStyle)
@@ -32,37 +32,37 @@ class MEUEditText : RelativeLayout {
     }
 
     private fun getAttrs(attrs: AttributeSet) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MEUEditText)
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MeUEditText)
         setTypeArray(typedArray)
     }
 
     private fun getAttrs(attrs: AttributeSet, defStyle: Int) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MEUEditText, defStyle, 0)
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MeUEditText, defStyle, 0)
         setTypeArray(typedArray)
     }
 
     private fun setTypeArray(typedArray: TypedArray) {
-        val backgroundResId = typedArray.getResourceId(R.styleable.MEUEditText_background, R.drawable.background_underline_black)
+        val backgroundResId = typedArray.getResourceId(R.styleable.MeUEditText_background, R.drawable.background_underline_black)
         v_root.setBackgroundResource(backgroundResId)
 
         //HintText
-        val hintText = typedArray.getString(R.styleable.MEUEditText_hintText)
+        val hintText = typedArray.getString(R.styleable.MeUEditText_hintText)
         tv_hint.text = hintText
 
-        val hintTextColor = typedArray.getResourceId(R.styleable.MEUEditText_hintTextColor, R.color.colorBlack)
+        val hintTextColor = typedArray.getResourceId(R.styleable.MeUEditText_hintTextColor, R.color.colorBlack)
         tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColor))
 
-        val hintTextSize = typedArray.getFloat(R.styleable.MEUEditText_hintTextSize, 15f)
+        val hintTextSize = typedArray.getFloat(R.styleable.MeUEditText_hintTextSize, 15f)
         tv_hint.textSize = hintTextSize
 
         //EditText
-        val editText = typedArray.getString(R.styleable.MEUEditText_editText)
+        val editText = typedArray.getString(R.styleable.MeUEditText_editText)
         et_input.setText(editText)
 
-        val editTextColor = typedArray.getResourceId(R.styleable.MEUEditText_editTextColor, R.color.colorBlack)
+        val editTextColor = typedArray.getResourceId(R.styleable.MeUEditText_editTextColor, R.color.colorBlack)
         et_input.setTextColor(ContextCompat.getColor(context, editTextColor))
 
-        val editTextSize = typedArray.getFloat(R.styleable.MEUEditText_editTextSize, 15f)
+        val editTextSize = typedArray.getFloat(R.styleable.MeUEditText_editTextSize, 15f)
         et_input.textSize = editTextSize
 
         typedArray.recycle()

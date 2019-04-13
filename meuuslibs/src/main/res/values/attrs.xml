@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="MEUEditText">
+    <declare-styleable name="MeUEditText">
         <attr name="background" format="reference|integer" />
         <attr name="hintText" format="reference|string" />
         <attr name="hintTextColor" format="reference|integer" />
