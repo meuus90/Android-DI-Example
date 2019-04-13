@@ -1,4 +1,4 @@
-package com.example.meuuslibs;
+package com.example.demo;
 
 import android.content.Context;
 

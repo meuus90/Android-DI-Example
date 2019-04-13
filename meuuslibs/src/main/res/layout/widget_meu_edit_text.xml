@@ -13,11 +13,13 @@
         android:layout_alignParentTop="true" />
 
     <TextView
+        android:id="@+id/tv_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="hint" />
 
     <EditText
+        android:id="@+id/et_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/v_hintPosition"
