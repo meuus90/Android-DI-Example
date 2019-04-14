@@ -41,19 +41,39 @@ class MeUEditText : RelativeLayout {
         setTypeArray(typedArray)
     }
 
+    private var backgroundBeforeFocus: Int = R.drawable.background_underline_black
+    private var backgroundAfterFocus: Int = R.drawable.background_underline_black
+    private var hintTextColorBeforeFocus: Int = R.color.colorBlack
+    private var hintTextColorAfterFocus: Int = R.color.colorBlack
+    private var hintTextSizeBeforeFocus: Float = 15f
+    private var hintTextSizeAfterFocus: Float = 15f
+
+    private var hintTextHorizontalPositionBeforeFocus: String = "center"
+    private var hintTextHorizontalPositionAfterFocus: String = "center"
+
+    private var hintTextVerticalPositionBeforeFocus: String = "center"
+    private var hintTextVerticalPositionAfterFocus: String = "center"
+
+    private var hintTextOverlapBeforeFocus: Boolean = true
+    private var hintTextOverlapAfterFocus: Boolean = true
+
     private fun setTypeArray(typedArray: TypedArray) {
-        val backgroundResId = typedArray.getResourceId(R.styleable.MeUEditText_background, R.drawable.background_underline_black)
-        v_root.setBackgroundResource(backgroundResId)
+        backgroundBeforeFocus = typedArray.getResourceId(R.styleable.MeUEditText_backgroundBeforeFocus, R.drawable.background_underline_black)
+        backgroundAfterFocus = typedArray.getResourceId(R.styleable.MeUEditText_backgroundAfterFocus, backgroundBeforeFocus)
+        v_root.setBackgroundResource(backgroundBeforeFocus)
 
         //HintText
         val hintText = typedArray.getString(R.styleable.MeUEditText_hintText)
         tv_hint.text = hintText
 
-        val hintTextColor = typedArray.getResourceId(R.styleable.MeUEditText_hintTextColor, R.color.colorBlack)
-        tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColor))
+        hintTextColorBeforeFocus = typedArray.getResourceId(R.styleable.MeUEditText_hintTextColorBeforeFocus, R.color.colorBlack)
+        hintTextColorAfterFocus = typedArray.getResourceId(R.styleable.MeUEditText_hintTextColorAfterFocus, hintTextColorBeforeFocus)
+        tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorBeforeFocus))
 
-        val hintTextSize = typedArray.getFloat(R.styleable.MeUEditText_hintTextSize, 15f)
-        tv_hint.textSize = hintTextSize
+        hintTextSizeBeforeFocus = typedArray.getFloat(R.styleable.MeUEditText_hintTextSizeBeforeFocus, 15f)
+        hintTextSizeAfterFocus = typedArray.getFloat(R.styleable.MeUEditText_hintTextSizeAfterFocus, hintTextSizeBeforeFocus)
+        tv_hint.textSize = hintTextSizeBeforeFocus
+
 
         //EditText
         val editText = typedArray.getString(R.styleable.MeUEditText_editText)
@@ -64,6 +84,18 @@ class MeUEditText : RelativeLayout {
 
         val editTextSize = typedArray.getFloat(R.styleable.MeUEditText_editTextSize, 15f)
         et_input.textSize = editTextSize
+
+
+
+
+        if (this.hasFocus()) {
+            v_root.setBackgroundResource(backgroundBeforeFocus)
+            tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorBeforeFocus))
+        } else {
+            v_root.setBackgroundResource(backgroundAfterFocus)
+            tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorAfterFocus))
+        }
+
 
         typedArray.recycle()
     }

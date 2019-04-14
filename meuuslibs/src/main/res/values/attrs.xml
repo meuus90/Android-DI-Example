@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MeUEditText">
-        <attr name="background" format="reference|integer" />
+        <attr name="backgroundBeforeFocus" format="reference|integer" />
+        <attr name="backgroundAfterFocus" format="reference|integer" />
+
         <attr name="hintText" format="reference|string" />
-        <attr name="hintTextColor" format="reference|integer" />
-        <attr name="hintTextSize" format="reference|float" />
+        <attr name="hintTextColorBeforeFocus" format="reference|integer" />
+        <attr name="hintTextColorAfterFocus" format="reference|integer" />
+        <attr name="hintTextSizeBeforeFocus" format="reference|float" />
+        <attr name="hintTextSizeAfterFocus" format="reference|float" />
+
         <attr name="editText" format="reference|string" />
         <attr name="editTextColor" format="reference|integer" />
         <attr name="editTextSize" format="reference|float" />
