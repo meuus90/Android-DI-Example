@@ -1,18 +1,22 @@
 package com.libs.meuuslibs.widget
 
 import android.animation.Animator
+import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.TransitionDrawable
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.EditText
 import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.content.ContextCompat
-import com.libs.meuuslibs.R
+import com.libs.meuuslibs.util.ConvertMetrics.Companion.dpToPx
 import kotlinx.android.synthetic.main.widget_meu_edit_text.view.*
 
 
@@ -44,81 +48,89 @@ class MeUEditText : ViewGroup {
 
     private fun initView(context: Context) {
         val li = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = li.inflate(R.layout.widget_meu_edit_text, this, false)
+        val view = li.inflate(com.libs.meuuslibs.R.layout.widget_meu_edit_text, this, false)
         addView(view)
     }
 
     private fun getAttrs(attrs: AttributeSet) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MeUEditText)
+        val typedArray = context.obtainStyledAttributes(attrs, com.libs.meuuslibs.R.styleable.MeUEditText)
         setTypeArray(typedArray)
     }
 
     private fun getAttrs(attrs: AttributeSet, defStyle: Int) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MeUEditText, defStyle, 0)
+        val typedArray = context.obtainStyledAttributes(attrs, com.libs.meuuslibs.R.styleable.MeUEditText, defStyle, 0)
         setTypeArray(typedArray)
     }
 
-    private var backgroundBeforeFocus: Int = R.drawable.background_underline_black
-    private var backgroundAfterFocus: Int = R.drawable.background_underline_black
-    private var hintTextColorBeforeFocus: Int = R.color.colorBlack
-    private var hintTextColorAfterFocus: Int = R.color.colorBlack
-    private var hintTextSizeBeforeFocus: Float = 15f
-    private var hintTextSizeAfterFocus: Float = 15f
+    private var backgroundBefore: Int = com.libs.meuuslibs.R.drawable.background_underline_black
+    private var backgroundAfter: Int = com.libs.meuuslibs.R.drawable.background_underline_black
+    private var backgroundDrawablesBefore: Array<Drawable>? = null
+    private var backgroundDrawablesAfter: Array<Drawable>? = null
 
-    private var hintTextVerticalPositionBeforeFocus: Int = center
-    private var hintTextVerticalPositionAfterFocus: Int = center
+    private var hintTextColorBefore: Int = com.libs.meuuslibs.R.color.colorBlack
+    private var hintTextColorAfter: Int = com.libs.meuuslibs.R.color.colorBlack
+    private var hintTextDrawablesBefore: Array<Drawable>? = null
+    private var hintTextDrawablesAfter: Array<Drawable>? = null
 
-    private var hintTextHorizontalPositionBeforeFocus: Int = center
-    private var hintTextHorizontalPositionAfterFocus: Int = center
+    private var hintTextSizeBefore: Int = 15
+    private var hintTextSizeAfter: Int = 15
+
+    private var hintTextVerticalPositionBefore: Int = center
+    private var hintTextVerticalPositionAfter: Int = center
+
+    private var hintTextHorizontalPositionBefore: Int = center
+    private var hintTextHorizontalPositionAfter: Int = center
 
     private fun setTypeArray(typedArray: TypedArray) {
-        backgroundBeforeFocus = typedArray.getResourceId(R.styleable.MeUEditText_backgroundBeforeFocus, R.drawable.background_underline_black)
-        backgroundAfterFocus = typedArray.getResourceId(R.styleable.MeUEditText_backgroundAfterFocus, backgroundBeforeFocus)
-        v_root.setBackgroundResource(backgroundBeforeFocus)
+        backgroundBefore = typedArray.getResourceId(com.libs.meuuslibs.R.styleable.MeUEditText_backgroundBefore, com.libs.meuuslibs.R.drawable.background_underline_black)
+        backgroundAfter = typedArray.getResourceId(com.libs.meuuslibs.R.styleable.MeUEditText_backgroundAfter, backgroundBefore)
+        backgroundDrawablesBefore = arrayOf(getDrawable(context, backgroundBefore)!!, getDrawable(context, backgroundAfter)!!)
+        backgroundDrawablesAfter = arrayOf(getDrawable(context, backgroundAfter)!!, getDrawable(context, backgroundBefore)!!)
+        v_root.background = TransitionDrawable(backgroundDrawablesBefore)
 
         //HintText
-        val hintText = typedArray.getString(R.styleable.MeUEditText_hintText)
-        tv_hintBeforeFocus.text = hintText
-        tv_hintAfterFocus.text = hintText
+        val hintText = typedArray.getString(com.libs.meuuslibs.R.styleable.MeUEditText_hintText)
+        tv_hintBefore.text = hintText
+        tv_hintAfter.text = hintText
 
-        hintTextColorBeforeFocus = typedArray.getResourceId(R.styleable.MeUEditText_hintTextColorBeforeFocus, R.color.colorBlack)
-        tv_hintBeforeFocus.setTextColor(ContextCompat.getColor(context, hintTextColorBeforeFocus))
-        hintTextColorAfterFocus = typedArray.getResourceId(R.styleable.MeUEditText_hintTextColorAfterFocus, hintTextColorBeforeFocus)
-        tv_hintAfterFocus.setTextColor(ContextCompat.getColor(context, hintTextColorAfterFocus))
+        hintTextColorBefore = typedArray.getResourceId(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextColorBefore, com.libs.meuuslibs.R.color.colorBlack)
+        tv_hintBefore.setTextColor(ContextCompat.getColor(context, hintTextColorBefore))
+        hintTextColorAfter = typedArray.getResourceId(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextColorAfter, hintTextColorBefore)
+        tv_hintAfter.setTextColor(ContextCompat.getColor(context, hintTextColorAfter))
+        tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorBefore))
 
-        hintTextSizeBeforeFocus = typedArray.getFloat(R.styleable.MeUEditText_hintTextSizeBeforeFocus, 15f)
-        tv_hintBeforeFocus.textSize = hintTextSizeBeforeFocus
-        hintTextSizeAfterFocus = typedArray.getFloat(R.styleable.MeUEditText_hintTextSizeAfterFocus, hintTextSizeBeforeFocus)
-        tv_hintAfterFocus.textSize = hintTextSizeAfterFocus
+        hintTextSizeBefore = typedArray.getDimensionPixelSize(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextSizeBefore, dpToPx(context, 15))
+        tv_hintBefore.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
+        hintTextSizeAfter = typedArray.getDimensionPixelSize(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextSizeAfter, hintTextSizeBefore)
+        tv_hintAfter.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeAfter.toFloat())
+        tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
 
-        hintTextVerticalPositionBeforeFocus = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBeforeFocus, 0)
-        setVerticalPosition(tv_hintBeforeFocus, hintTextVerticalPositionBeforeFocus)
-        hintTextVerticalPositionAfterFocus = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBeforeFocus, hintTextVerticalPositionBeforeFocus)
-        setVerticalPosition(tv_hintAfterFocus, hintTextVerticalPositionAfterFocus)
+        hintTextVerticalPositionBefore = typedArray.getInt(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextVerticalPositionBefore, 0)
+        hintTextVerticalPositionAfter = typedArray.getInt(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextVerticalPositionBefore, hintTextVerticalPositionBefore)
+        setVerticalPosition()
 
-        hintTextHorizontalPositionBeforeFocus = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBeforeFocus, 0)
-        setHorizontalPosition(tv_hintBeforeFocus, hintTextHorizontalPositionBeforeFocus)
-        hintTextHorizontalPositionAfterFocus = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionAfterFocus, hintTextHorizontalPositionBeforeFocus)
-        setHorizontalPosition(tv_hintAfterFocus, hintTextHorizontalPositionAfterFocus)
+        hintTextHorizontalPositionBefore = typedArray.getInt(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextHorizontalPositionBefore, 0)
+        hintTextHorizontalPositionAfter = typedArray.getInt(com.libs.meuuslibs.R.styleable.MeUEditText_hintTextHorizontalPositionAfter, hintTextHorizontalPositionBefore)
+        setHorizontalPosition()
 
 
         //EditText
-        val editText = typedArray.getString(R.styleable.MeUEditText_editText)
+        val editText = typedArray.getString(com.libs.meuuslibs.R.styleable.MeUEditText_editText)
         et_input.setText(editText)
 
-        val editTextColor = typedArray.getResourceId(R.styleable.MeUEditText_editTextColor, R.color.colorBlack)
+        val editTextColor = typedArray.getResourceId(com.libs.meuuslibs.R.styleable.MeUEditText_editTextColor, com.libs.meuuslibs.R.color.colorBlack)
         et_input.setTextColor(ContextCompat.getColor(context, editTextColor))
 
-        val editTextSize = typedArray.getFloat(R.styleable.MeUEditText_editTextSize, 15f)
-        et_input.textSize = editTextSize
+        val editTextSize = typedArray.getDimensionPixelSize(com.libs.meuuslibs.R.styleable.MeUEditText_editTextSize, dpToPx(context, 15))
+        et_input.setTextSize(TypedValue.COMPLEX_UNIT_PX, editTextSize.toFloat())
 
 
-//        if (this.hasFocus()) {
-//            v_root.setBackgroundResource(backgroundBeforeFocus)
-//            tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorBeforeFocus))
+//        if (this.has()) {
+//            v_root.setBackgroundResource(backgroundBefore)
+//            tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorBefore))
 //        } else {
-//            v_root.setBackgroundResource(backgroundAfterFocus)
-//            tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorAfterFocus))
+//            v_root.setBackgroundResource(backgroundAfter)
+//            tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorAfter))
 //        }
 
 
@@ -126,48 +138,153 @@ class MeUEditText : ViewGroup {
     }
 
     fun getHint(): String {
-        return tv_hintBeforeFocus.text.toString()
+        return tv_hintBefore.text.toString()
     }
 
     fun setHint(hint: String) {
-        tv_hintBeforeFocus.text = hint
-        tv_hintAfterFocus.text = hint
+        tv_hint.text = hint
+        tv_hintBefore.text = hint
+        tv_hintAfter.text = hint
     }
 
     fun getEditText(): EditText {
         return et_input
     }
 
-    private fun setVerticalPosition(textView: TextView, position: Int) {
-        val params = textView.layoutParams as RelativeLayout.LayoutParams
-        when (position) {
-            top -> params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
-            bottom -> params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-            else -> params.addRule(RelativeLayout.CENTER_VERTICAL)
+    private fun setVerticalPosition() {
+        val paramsHintBefore = tv_hintBefore.layoutParams as RelativeLayout.LayoutParams
+        val paramsHintAfter = tv_hintAfter.layoutParams as RelativeLayout.LayoutParams
+        val paramsInput = et_input.layoutParams as RelativeLayout.LayoutParams
+
+        when {
+            hintTextVerticalPositionBefore == top && hintTextVerticalPositionAfter == top -> {
+                when {
+                    hintTextSizeBefore < hintTextSizeAfter -> paramsInput.topMargin = hintTextSizeAfter
+                    else -> paramsInput.topMargin = hintTextSizeBefore
+                }
+                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            }
+
+            hintTextVerticalPositionBefore == top && hintTextVerticalPositionAfter == center -> {
+                paramsInput.topMargin = hintTextSizeBefore
+                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL)
+            }
+
+            hintTextVerticalPositionBefore == top && hintTextVerticalPositionAfter == bottom -> {
+                paramsInput.topMargin = hintTextSizeBefore
+                paramsInput.bottomMargin = hintTextSizeAfter
+                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+            }
+
+            hintTextVerticalPositionBefore == center && hintTextVerticalPositionAfter == top -> {
+                paramsInput.topMargin = hintTextSizeAfter
+                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL)
+                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            }
+
+            hintTextVerticalPositionBefore == center && hintTextVerticalPositionAfter == center -> {
+                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL)
+                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL)
+            }
+
+            hintTextVerticalPositionBefore == center && hintTextVerticalPositionAfter == bottom -> {
+                paramsInput.bottomMargin = hintTextSizeAfter
+                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL)
+                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+            }
+
+            hintTextVerticalPositionBefore == bottom && hintTextVerticalPositionAfter == top -> {
+                paramsInput.topMargin = hintTextSizeAfter
+                paramsInput.bottomMargin = hintTextSizeBefore
+                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            }
+
+            hintTextVerticalPositionBefore == bottom && hintTextVerticalPositionAfter == center -> {
+                paramsInput.bottomMargin = hintTextSizeBefore
+                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL)
+            }
+
+            hintTextVerticalPositionBefore == bottom && hintTextVerticalPositionAfter == bottom -> {
+                when {
+                    hintTextSizeBefore < hintTextSizeAfter -> paramsInput.topMargin = hintTextSizeAfter
+                    else -> paramsInput.topMargin = hintTextSizeBefore
+                }
+                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+            }
         }
-        textView.layoutParams = params
+        et_input.layoutParams = paramsInput
+        tv_hintBefore.layoutParams = paramsHintBefore
+        tv_hintAfter.layoutParams = paramsHintAfter
+        tv_hint.layoutParams = paramsHintBefore
     }
 
-    private fun setHorizontalPosition(textView: TextView, position: Int) {
-        val params = textView.layoutParams as RelativeLayout.LayoutParams
-        when (position) {
-            left, start -> params.addRule(RelativeLayout.ALIGN_PARENT_START)
-            right, end -> params.addRule(RelativeLayout.ALIGN_PARENT_END)
-            else -> params.addRule(RelativeLayout.CENTER_HORIZONTAL)
+    private fun setHorizontalPosition() {
+        val paramsHintBefore = tv_hintBefore.layoutParams as RelativeLayout.LayoutParams
+        when (hintTextHorizontalPositionBefore) {
+            left, start -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_START)
+            right, end -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_END)
+            else -> paramsHintBefore.addRule(RelativeLayout.CENTER_HORIZONTAL)
         }
-        textView.layoutParams = params
+        tv_hintBefore.layoutParams = paramsHintBefore
+
+        val paramsHintAfter = tv_hintAfter.layoutParams as RelativeLayout.LayoutParams
+        when (hintTextHorizontalPositionBefore) {
+            left, start -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_START)
+            right, end -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_END)
+            else -> paramsHintAfter.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        }
+        tv_hintAfter.layoutParams = paramsHintAfter
+
+        tv_hint.layoutParams = paramsHintBefore
     }
 
-    fun setAnim() {
-        val scaleAnimator = if (et_input.isFocused) ValueAnimator.ofFloat(0f, 1f) else ValueAnimator.ofFloat(1f, 0f)
-        scaleAnimator.duration = 300
-        scaleAnimator.interpolator = DecelerateInterpolator()
-        scaleAnimator.addUpdateListener {
+    private fun setAnim(duration: Int) {
+        val mAnimator = ValueAnimator()
+        val hintParams = tv_hint.layoutParams
+        val hintWidthDifference = (tv_hintBefore.layoutParams.height - tv_hintAfter.layoutParams.height).unaryPlus()
+        val hintHeightDifference = (tv_hintBefore.layoutParams.width - tv_hintAfter.layoutParams.width).unaryPlus()
+        if (et_input.hasFocus())
+            mAnimator.setIntValues(hintTextColorBefore, hintTextColorAfter)
+        else
+            mAnimator.setIntValues(hintTextColorAfter, hintTextColorBefore)
+        mAnimator.setEvaluator(ArgbEvaluator())
+        mAnimator.duration = duration.toLong()
+        mAnimator.interpolator = DecelerateInterpolator()
+        mAnimator.addUpdateListener {
+            tv_hint.setTextColor(ContextCompat.getColor(context, it.animatedValue as Int))
+            val fraction = it.animatedFraction
+
+            if(et_input.hasFocus()) {
+                hintParams.width = (hintWidthDifference.toFloat() * fraction).toInt()  //todo:refactoring
+                hintParams.height = (hintHeightDifference.toFloat() * fraction).toInt()  //todo:refactoring
+
+//                tv_hint.getLocationInWindow()
+            }
+
+
+
+
+            //size
+            //position x
+            //position y
 
 
         }
-        scaleAnimator.addListener(object : Animator.AnimatorListener {
+        mAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animation: Animator?) {
+                if (et_input.hasFocus()) {
+                    v_root.background = TransitionDrawable(backgroundDrawablesBefore)
+                    (v_root.background as TransitionDrawable).startTransition(duration)
+                } else {
+                    v_root.background = TransitionDrawable(backgroundDrawablesAfter)
+                    (v_root.background as TransitionDrawable).startTransition(duration)
+                }
             }
 
             override fun onAnimationEnd(animation: Animator?) {
@@ -179,10 +296,10 @@ class MeUEditText : ViewGroup {
             override fun onAnimationCancel(animation: Animator?) {
             }
         })
-        scaleAnimator.start()
+        mAnimator.start()
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        setAnim(300)
     }
 }
