@@ -4,13 +4,16 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.libs.meuuslibs.R
 import kotlinx.android.synthetic.main.widget_meu_edit_text.view.*
 
 
-class MeUEditText : RelativeLayout {
+class MeUEditText : ViewGroup {
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         initView(context)
         getAttrs(attrs, defStyle)
@@ -85,9 +88,6 @@ class MeUEditText : RelativeLayout {
         val editTextSize = typedArray.getFloat(R.styleable.MeUEditText_editTextSize, 15f)
         et_input.textSize = editTextSize
 
-
-
-
         if (this.hasFocus()) {
             v_root.setBackgroundResource(backgroundBeforeFocus)
             tv_hint.setTextColor(ContextCompat.getColor(context, hintTextColorBeforeFocus))
@@ -100,28 +100,15 @@ class MeUEditText : RelativeLayout {
         typedArray.recycle()
     }
 
-    fun setHintText(text: String) {
-        tv_hint.text = text
+    fun getHintText(text: String)  :TextView{
+        return tv_hint
     }
 
-    fun setHintTextColor(color: Int) {
-        tv_hint.setTextColor(color)
+    fun getEditText(text: String) :EditText{
+        return et_input
     }
 
-    fun setHintTextSize(size: Float) {
-        tv_hint.textSize = size
-    }
-
-
-    fun setEditText(text: String) {
-        et_input.setText(text)
-    }
-
-    fun setEditTextColor(color: Int) {
-        et_input.setTextColor(color)
-    }
-
-    fun setEditTextSize(size: Float) {
-        et_input.textSize = size
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

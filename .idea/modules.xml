@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/MeUusLibs.iml" filepath="$PROJECT_DIR$/.idea/MeUusLibs.iml" />
       <module fileurl="file://$PROJECT_DIR$/MeUusLibs.iml" filepath="$PROJECT_DIR$/MeUusLibs.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/meuuslibs/meuuslibs.iml" filepath="$PROJECT_DIR$/meuuslibs/meuuslibs.iml" />
       <module fileurl="file://$PROJECT_DIR$/meuuslibs/meuuslibs.iml" filepath="$PROJECT_DIR$/meuuslibs/meuuslibs.iml" />
     </modules>
   </component>
