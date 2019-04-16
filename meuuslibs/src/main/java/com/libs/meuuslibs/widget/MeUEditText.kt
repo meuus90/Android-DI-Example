@@ -14,7 +14,6 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import android.widget.EditText
-import android.widget.RelativeLayout
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -145,107 +144,35 @@ class MeUEditText : ConstraintLayout {
     }
 
     private fun setVerticalPosition() {
-        val paramsHintBefore = tv_hintBefore.layoutParams as ConstraintLayout.LayoutParams
-        val paramsHintAfter = tv_hintAfter.layoutParams as ConstraintLayout.LayoutParams
-        val paramsInput = et_input.layoutParams as ConstraintLayout.LayoutParams
-
-
         val constraintSet = ConstraintSet()
-        constraintSet.addToVerticalChain(et_input.id, 0, 0)
+        constraintSet.clone(this)
 
-        when(hintTextVerticalPositionBefore){
-            positionTop -> constraintSet.addToVerticalChain(et_input.id, tv_hintBefore.id, 0)
-            positionBottom -> constraintSet.addToVerticalChain(et_input.id, 0, tv_hintBefore.id)
-            else -> constraintSet.addToVerticalChain(et_input.id, 0, 0)
+        when (hintTextVerticalPositionBefore) {
+            positionTop -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM)
+            positionBottom -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP)
         }
 
-
-
-//        when {
-//            hintTextVerticalPositionBefore == positionTop && hintTextVerticalPositionAfter == positionTop -> {
-//                when {
-//                    hintTextSizeBefore > hintTextSizeAfter -> paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
-//                    else -> paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
-//                }
-//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionTop && hintTextVerticalPositionAfter == positionCenter -> {
-//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
-//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionTop && hintTextVerticalPositionAfter == positionBottom -> {
-//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
-//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
-//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionCenter && hintTextVerticalPositionAfter == positionTop -> {
-//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
-//                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionCenter && hintTextVerticalPositionAfter == positionCenter -> {
-//                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionCenter && hintTextVerticalPositionAfter == positionBottom -> {
-//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
-//                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionBottom && hintTextVerticalPositionAfter == positionTop -> {
-//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
-//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
-//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionBottom && hintTextVerticalPositionAfter == positionCenter -> {
-//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
-//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-//            }
-//
-//            hintTextVerticalPositionBefore == positionBottom && hintTextVerticalPositionAfter == positionBottom -> {
-//                when {
-//                    hintTextSizeBefore > hintTextSizeAfter -> paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
-//                    else -> paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
-//                }
-//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-//            }
-//        }
-        et_input.layoutParams = paramsInput
-        tv_hintBefore.layoutParams = paramsHintBefore
-        tv_hintAfter.layoutParams = paramsHintAfter
-        tv_hint.layoutParams = paramsHintBefore
+        when (hintTextVerticalPositionAfter) {
+            positionTop -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM)
+            positionBottom -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP)
+        }
+        constraintSet.applyTo(this)
     }
 
     private fun setHorizontalPosition() {
-        val paramsHintBefore = tv_hintBefore.layoutParams as RelativeLayout.LayoutParams
-        when (hintTextHorizontalPositionBefore) {
-            left, positionStart -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_START, RelativeLayout.TRUE)
-            right, positionEnd -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-            else -> paramsHintBefore.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE)
-        }
-        tv_hintBefore.layoutParams = paramsHintBefore
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(this)
 
-        val paramsHintAfter = tv_hintAfter.layoutParams as RelativeLayout.LayoutParams
-        when (hintTextHorizontalPositionAfter) {
-            left, positionStart -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_START, RelativeLayout.TRUE)
-            right, positionEnd -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-            else -> paramsHintAfter.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE)
+        when (hintTextHorizontalPositionBefore) {
+            positionStart -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.START, et_input.id, ConstraintSet.START)
+            positionEnd -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.END, et_input.id, ConstraintSet.END)
         }
-        tv_hintAfter.layoutParams = paramsHintAfter
-        tv_hint.layoutParams = paramsHintBefore
+
+        when (hintTextHorizontalPositionAfter) {
+            positionStart -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.START, et_input.id, ConstraintSet.START)
+            positionEnd -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.END, et_input.id, ConstraintSet.END)
+        }
+        constraintSet.applyTo(this)
     }
 
     private var animatorSet = AnimatorSet()
