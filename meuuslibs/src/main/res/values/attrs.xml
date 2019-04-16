@@ -5,8 +5,8 @@
         <attr name="backgroundAfter" format="reference|integer" />
 
         <attr name="hintText" format="reference|string" />
-        <attr name="hintTextColorBefore" format="reference|integer" />
-        <attr name="hintTextColorAfter" format="reference|integer" />
+        <attr name="hintTextColorBefore" format="reference|color" />
+        <attr name="hintTextColorAfter" format="reference|color" />
         <attr name="hintTextSizeBefore" format="reference|dimension" />
         <attr name="hintTextSizeAfter" format="reference|dimension" />
 
@@ -36,7 +36,8 @@
         </attr>
 
         <attr name="editText" format="reference|string" />
-        <attr name="editTextColor" format="reference|integer" />
+        <attr name="editTextColor" format="reference|color" />
         <attr name="editTextSize" format="reference|dimension" />
+        <attr name="animationDuration" format="integer" />
     </declare-styleable>
 </resources>
