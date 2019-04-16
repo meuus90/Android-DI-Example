@@ -16,6 +16,8 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.EditText
 import android.widget.RelativeLayout
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import com.jakewharton.rxbinding2.view.RxView
 import com.libs.meuuslibs.R
@@ -25,15 +27,13 @@ import kotlinx.android.synthetic.main.widget_meu_edit_text.view.*
 import java.util.concurrent.TimeUnit
 
 
-class MeUEditText : RelativeLayout {
+class MeUEditText : ConstraintLayout {
     companion object {
-        const val top = -1
-        const val bottom = 1
-        const val left = -1
-        const val start = -1
-        const val right = 1
-        const val end = 1
-        const val center = 0
+        const val positionTop = -1
+        const val positionBottom = 1
+        const val positionStart = -1
+        const val positionEnd = 1
+        const val positionCenter = 0
 
     }
 
@@ -78,11 +78,11 @@ class MeUEditText : RelativeLayout {
     private var hintTextSizeBefore: Int = 15
     private var hintTextSizeAfter: Int = 15
 
-    private var hintTextVerticalPositionBefore: Int = center
-    private var hintTextVerticalPositionAfter: Int = center
+    private var hintTextVerticalPositionBefore: Int = positionCenter
+    private var hintTextVerticalPositionAfter: Int = positionCenter
 
-    private var hintTextHorizontalPositionBefore: Int = center
-    private var hintTextHorizontalPositionAfter: Int = center
+    private var hintTextHorizontalPositionBefore: Int = positionCenter
+    private var hintTextHorizontalPositionAfter: Int = positionCenter
 
     private var animationDuration: Long = 100
 
@@ -111,11 +111,11 @@ class MeUEditText : RelativeLayout {
         tv_hintAfter.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeAfter.toFloat())
         tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
 
-        hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, center)
+        hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, positionCenter)
         hintTextVerticalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionAfter, hintTextVerticalPositionBefore)
         setVerticalPosition()
 
-        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, center)
+        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, positionCenter)
         hintTextHorizontalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionAfter, hintTextHorizontalPositionBefore)
         setHorizontalPosition()
 
@@ -145,72 +145,84 @@ class MeUEditText : RelativeLayout {
     }
 
     private fun setVerticalPosition() {
-        val paramsHintBefore = tv_hintBefore.layoutParams as RelativeLayout.LayoutParams
-        val paramsHintAfter = tv_hintAfter.layoutParams as RelativeLayout.LayoutParams
-        val paramsInput = et_input.layoutParams as RelativeLayout.LayoutParams
+        val paramsHintBefore = tv_hintBefore.layoutParams as ConstraintLayout.LayoutParams
+        val paramsHintAfter = tv_hintAfter.layoutParams as ConstraintLayout.LayoutParams
+        val paramsInput = et_input.layoutParams as ConstraintLayout.LayoutParams
 
-        when {
-            hintTextVerticalPositionBefore == top && hintTextVerticalPositionAfter == top -> {
-                when {
-                    hintTextSizeBefore > hintTextSizeAfter -> paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
-                    else -> paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
-                }
-                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-            }
 
-            hintTextVerticalPositionBefore == top && hintTextVerticalPositionAfter == center -> {
-                paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
-                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-            }
+        val constraintSet = ConstraintSet()
+        constraintSet.addToVerticalChain(et_input.id, 0, 0)
 
-            hintTextVerticalPositionBefore == top && hintTextVerticalPositionAfter == bottom -> {
-                paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
-                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
-                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-            }
-
-            hintTextVerticalPositionBefore == center && hintTextVerticalPositionAfter == top -> {
-                paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
-                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-            }
-
-            hintTextVerticalPositionBefore == center && hintTextVerticalPositionAfter == center -> {
-                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-            }
-
-            hintTextVerticalPositionBefore == center && hintTextVerticalPositionAfter == bottom -> {
-                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
-                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-            }
-
-            hintTextVerticalPositionBefore == bottom && hintTextVerticalPositionAfter == top -> {
-                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
-                paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
-                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-            }
-
-            hintTextVerticalPositionBefore == bottom && hintTextVerticalPositionAfter == center -> {
-                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
-                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-            }
-
-            hintTextVerticalPositionBefore == bottom && hintTextVerticalPositionAfter == bottom -> {
-                when {
-                    hintTextSizeBefore > hintTextSizeAfter -> paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
-                    else -> paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
-                }
-                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-            }
+        when(hintTextVerticalPositionBefore){
+            positionTop -> constraintSet.addToVerticalChain(et_input.id, tv_hintBefore.id, 0)
+            positionBottom -> constraintSet.addToVerticalChain(et_input.id, 0, tv_hintBefore.id)
+            else -> constraintSet.addToVerticalChain(et_input.id, 0, 0)
         }
+
+
+
+//        when {
+//            hintTextVerticalPositionBefore == positionTop && hintTextVerticalPositionAfter == positionTop -> {
+//                when {
+//                    hintTextSizeBefore > hintTextSizeAfter -> paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
+//                    else -> paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
+//                }
+//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionTop && hintTextVerticalPositionAfter == positionCenter -> {
+//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
+//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionTop && hintTextVerticalPositionAfter == positionBottom -> {
+//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintBefore.id)
+//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
+//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionCenter && hintTextVerticalPositionAfter == positionTop -> {
+//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
+//                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionCenter && hintTextVerticalPositionAfter == positionCenter -> {
+//                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionCenter && hintTextVerticalPositionAfter == positionBottom -> {
+//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
+//                paramsHintBefore.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionBottom && hintTextVerticalPositionAfter == positionTop -> {
+//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
+//                paramsInput.addRule(RelativeLayout.BELOW, tv_hintAfter.id)
+//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionBottom && hintTextVerticalPositionAfter == positionCenter -> {
+//                paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
+//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+//            }
+//
+//            hintTextVerticalPositionBefore == positionBottom && hintTextVerticalPositionAfter == positionBottom -> {
+//                when {
+//                    hintTextSizeBefore > hintTextSizeAfter -> paramsInput.addRule(RelativeLayout.ABOVE, tv_hintBefore.id)
+//                    else -> paramsInput.addRule(RelativeLayout.ABOVE, tv_hintAfter.id)
+//                }
+//                paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+//                paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+//            }
+//        }
         et_input.layoutParams = paramsInput
         tv_hintBefore.layoutParams = paramsHintBefore
         tv_hintAfter.layoutParams = paramsHintAfter
@@ -220,30 +232,24 @@ class MeUEditText : RelativeLayout {
     private fun setHorizontalPosition() {
         val paramsHintBefore = tv_hintBefore.layoutParams as RelativeLayout.LayoutParams
         when (hintTextHorizontalPositionBefore) {
-            left, start -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_START)
-            right, end -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_END)
-            else -> paramsHintBefore.addRule(RelativeLayout.CENTER_HORIZONTAL)
+            left, positionStart -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_START, RelativeLayout.TRUE)
+            right, positionEnd -> paramsHintBefore.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
+            else -> paramsHintBefore.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE)
         }
         tv_hintBefore.layoutParams = paramsHintBefore
 
         val paramsHintAfter = tv_hintAfter.layoutParams as RelativeLayout.LayoutParams
-        when (hintTextHorizontalPositionBefore) {
-            left, start -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_START)
-            right, end -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_END)
-            else -> paramsHintAfter.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        when (hintTextHorizontalPositionAfter) {
+            left, positionStart -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_START, RelativeLayout.TRUE)
+            right, positionEnd -> paramsHintAfter.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
+            else -> paramsHintAfter.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE)
         }
         tv_hintAfter.layoutParams = paramsHintAfter
         tv_hint.layoutParams = paramsHintBefore
     }
 
+    private var animatorSet = AnimatorSet()
     private fun setAnim(duration: Long, isFocused: Boolean) {
-        val hintSizeDifference = tv_hintBefore.textSize - tv_hintAfter.textSize
-
-        val smallSize = if (hintSizeDifference < 0) tv_hintBefore.textSize else tv_hintAfter.textSize
-
-        val hintXDifference = tv_hintAfter.x - tv_hintBefore.x
-        val hintYDifference = tv_hintAfter.y - tv_hintBefore.y
-
         val colorAnimator = ValueAnimator()
         if (isFocused)
             colorAnimator.setIntValues(hintTextColorBefore, hintTextColorAfter)
@@ -256,19 +262,23 @@ class MeUEditText : RelativeLayout {
             tv_hint.setTextColor(it.animatedValue as Int)
         }
 
+        val hintSizeDifference = tv_hintBefore.textSize - tv_hintAfter.textSize
+        val hintXDifference = tv_hintBefore.x - tv_hintAfter.x
+        val hintYDifference = tv_hintBefore.y - tv_hintAfter.y
+
         val scaleAnimator = if (isFocused) ValueAnimator.ofFloat(0f, 1f) else ValueAnimator.ofFloat(1f, 0f)
         scaleAnimator.duration = duration
         scaleAnimator.interpolator = DecelerateInterpolator()
         scaleAnimator.addUpdateListener {
             val floatValue = it.animatedValue as Float
 
-            tv_hint.textSize = hintSizeDifference * floatValue + smallSize
+            tv_hint.textSize = tv_hintBefore.textSize - hintSizeDifference * floatValue
+//            tv_hint.textSize = hintSizeDifference * floatValue + smallSize
 
-            tv_hint.translationX = hintXDifference * floatValue
-            tv_hint.translationY = hintYDifference * floatValue
+            tv_hint.x = tv_hintBefore.x - hintXDifference * floatValue
+            tv_hint.y = tv_hintBefore.y - hintYDifference * floatValue
         }
 
-        val animatorSet = AnimatorSet()
         animatorSet.playTogether(colorAnimator, scaleAnimator)
         animatorSet.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animation: Animator?) {

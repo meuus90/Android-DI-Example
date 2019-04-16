@@ -40,4 +40,6 @@
         <attr name="editTextSize" format="reference|dimension" />
         <attr name="animationDuration" format="integer" />
     </declare-styleable>
+
+
 </resources>
