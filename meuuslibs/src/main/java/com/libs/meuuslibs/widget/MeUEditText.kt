@@ -112,11 +112,9 @@ class MeUEditText : ConstraintLayout {
 
         hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, positionCenter)
         hintTextVerticalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionAfter, hintTextVerticalPositionBefore)
-        setVerticalPosition()
 
         hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, positionCenter)
         hintTextHorizontalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionAfter, hintTextHorizontalPositionBefore)
-        setHorizontalPosition()
 
         animationDuration = typedArray.getInt(R.styleable.MeUEditText_animationDuration, 100).toLong()
 
@@ -130,7 +128,7 @@ class MeUEditText : ConstraintLayout {
         val editTextSize = typedArray.getDimensionPixelSize(R.styleable.MeUEditText_editTextSize, dpToPx(context, 15))
         et_input.setTextSize(TypedValue.COMPLEX_UNIT_PX, editTextSize.toFloat())
 
-
+        setPosition()
 
 
         Log.e("background", "backgroundBefore : $backgroundBefore, backgroundAfter : $backgroundAfter")
@@ -143,36 +141,47 @@ class MeUEditText : ConstraintLayout {
         typedArray.recycle()
     }
 
-    private fun setVerticalPosition() {
+    private fun setPosition() {
         val constraintSet = ConstraintSet()
-        constraintSet.clone(this)
-
+        constraintSet.clone(v_root)
         when (hintTextVerticalPositionBefore) {
-            positionTop -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM)
-            positionBottom -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP)
+            positionTop -> {
+                constraintSet.connect(tv_hintBefore.id, ConstraintSet.TOP, v_root.id, ConstraintSet.TOP, 0)
+                constraintSet.connect(tv_hintBefore.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP, 0)
+            }
+            positionBottom -> {
+                constraintSet.connect(tv_hintBefore.id, ConstraintSet.BOTTOM, v_root.id, ConstraintSet.BOTTOM, 0)
+                constraintSet.connect(tv_hintBefore.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM, 0)
+            }
         }
 
         when (hintTextVerticalPositionAfter) {
-            positionTop -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM)
-            positionBottom -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP)
+            positionTop -> {
+                constraintSet.connect(tv_hintAfter.id, ConstraintSet.TOP, v_root.id, ConstraintSet.TOP, 0)
+                constraintSet.connect(tv_hintAfter.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP, 0)
+            }
+            positionBottom -> {
+                constraintSet.connect(tv_hintAfter.id, ConstraintSet.BOTTOM, v_root.id, ConstraintSet.BOTTOM, 0)
+                constraintSet.connect(tv_hintAfter.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM, 0)
+            }
         }
-        constraintSet.applyTo(this)
-    }
-
-    private fun setHorizontalPosition() {
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(this)
 
         when (hintTextHorizontalPositionBefore) {
-            positionStart -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.START, et_input.id, ConstraintSet.START)
-            positionEnd -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.END, et_input.id, ConstraintSet.END)
+            positionStart -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.START, v_root.id, ConstraintSet.START, 0)
+            positionEnd -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.END, v_root.id, ConstraintSet.END, 0)
         }
 
         when (hintTextHorizontalPositionAfter) {
-            positionStart -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.START, et_input.id, ConstraintSet.START)
-            positionEnd -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.END, et_input.id, ConstraintSet.END)
+            positionStart -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.START, v_root.id, ConstraintSet.START, 0)
+            positionEnd -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.END, v_root.id, ConstraintSet.END, 0)
         }
-        constraintSet.applyTo(this)
+        constraintSet.applyTo(v_root)
+
+        disposable = RxView.focusChanges(et_input)
+                .throttleFirst(animationDuration, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    setAnim(animationDuration, it)
+                }
     }
 
     private var animatorSet = AnimatorSet()
@@ -194,17 +203,17 @@ class MeUEditText : ConstraintLayout {
         val hintYDifference = tv_hintBefore.y - tv_hintAfter.y
 
         val scaleAnimator = if (isFocused) ValueAnimator.ofFloat(0f, 1f) else ValueAnimator.ofFloat(1f, 0f)
-        scaleAnimator.duration = duration
-        scaleAnimator.interpolator = DecelerateInterpolator()
-        scaleAnimator.addUpdateListener {
-            val floatValue = it.animatedValue as Float
-
-            tv_hint.textSize = tv_hintBefore.textSize - hintSizeDifference * floatValue
-//            tv_hint.textSize = hintSizeDifference * floatValue + smallSize
-
-            tv_hint.x = tv_hintBefore.x - hintXDifference * floatValue
-            tv_hint.y = tv_hintBefore.y - hintYDifference * floatValue
-        }
+//        scaleAnimator.duration = duration
+//        scaleAnimator.interpolator = DecelerateInterpolator()
+//        scaleAnimator.addUpdateListener {
+//            val floatValue = it.animatedValue as Float
+//
+//            tv_hint.textSize = tv_hintBefore.textSize - hintSizeDifference * floatValue
+////            tv_hint.textSize = hintSizeDifference * floatValue + smallSize
+//
+//            tv_hint.x = tv_hintBefore.x - hintXDifference * floatValue
+//            tv_hint.y = tv_hintBefore.y - hintYDifference * floatValue
+//        }
 
         animatorSet.playTogether(colorAnimator, scaleAnimator)
         animatorSet.addListener(object : Animator.AnimatorListener {
@@ -230,15 +239,6 @@ class MeUEditText : ConstraintLayout {
 
 
         animatorSet.start()
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        disposable = RxView.focusChanges(et_input)
-                .throttleFirst(animationDuration, TimeUnit.MILLISECONDS)
-                .subscribe {
-                    setAnim(animationDuration, it)
-                }
     }
 
     var disposable: Disposable? = null
