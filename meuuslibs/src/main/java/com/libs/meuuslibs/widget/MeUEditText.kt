@@ -9,31 +9,29 @@ import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.TransitionDrawable
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
-import android.widget.EditText
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.jakewharton.rxbinding2.view.RxView
 import com.libs.meuuslibs.R
 import com.libs.meuuslibs.util.ConvertMetrics.Companion.dpToPx
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.widget_meu_edit_text.view.*
-import java.util.concurrent.TimeUnit
 
 
 class MeUEditText : ConstraintLayout {
     companion object {
-        const val positionTop = -1
-        const val positionBottom = 1
-        const val positionStart = -1
-        const val positionEnd = 1
-        const val positionCenter = 0
-
+        const val posTop = -1
+        const val posBottom = 1
+        const val posStart = -1
+        const val posEnd = 1
+        const val posCenter = 0
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
@@ -77,13 +75,13 @@ class MeUEditText : ConstraintLayout {
     private var hintTextSizeBefore: Int = 15
     private var hintTextSizeAfter: Int = 15
 
-    private var hintTextVerticalPositionBefore: Int = positionCenter
-    private var hintTextVerticalPositionAfter: Int = positionCenter
+    private var hintTextVerticalPositionBefore: Int = posCenter
+    private var hintTextVerticalPositionAfter: Int = posCenter
 
-    private var hintTextHorizontalPositionBefore: Int = positionCenter
-    private var hintTextHorizontalPositionAfter: Int = positionCenter
+    private var hintTextHorizontalPositionBefore: Int = posCenter
+    private var hintTextHorizontalPositionAfter: Int = posCenter
 
-    private var animationDuration: Long = 100
+    private var animateDuration: Long = 100
 
     private fun setTypeArray(typedArray: TypedArray) {
         backgroundBefore = typedArray.getResourceId(R.styleable.MeUEditText_backgroundBefore, R.drawable.background_underline_black)
@@ -110,13 +108,13 @@ class MeUEditText : ConstraintLayout {
         tv_hintAfter.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeAfter.toFloat())
         tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
 
-        hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, positionCenter)
+        hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, posCenter)
         hintTextVerticalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionAfter, hintTextVerticalPositionBefore)
 
-        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, positionCenter)
+        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, posCenter)
         hintTextHorizontalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionAfter, hintTextHorizontalPositionBefore)
 
-        animationDuration = typedArray.getInt(R.styleable.MeUEditText_animationDuration, 100).toLong()
+        animateDuration = typedArray.getInt(R.styleable.MeUEditText_animateDuration, 100).toLong()
 
         //EditText
         val editText = typedArray.getString(R.styleable.MeUEditText_editText)
@@ -128,102 +126,123 @@ class MeUEditText : ConstraintLayout {
         val editTextSize = typedArray.getDimensionPixelSize(R.styleable.MeUEditText_editTextSize, dpToPx(context, 15))
         et_input.setTextSize(TypedValue.COMPLEX_UNIT_PX, editTextSize.toFloat())
 
-        setPosition()
+        setPosition(hintTextVerticalPositionBefore, hintTextHorizontalPositionBefore, tv_hintBefore.id)
+        setPosition(hintTextVerticalPositionAfter, hintTextHorizontalPositionAfter, tv_hintAfter.id)
 
-
-        Log.e("background", "backgroundBefore : $backgroundBefore, backgroundAfter : $backgroundAfter")
-        Log.e("hint", "hintText : $hintText")
-        Log.e("hintColor", "hintTextColorBefore : $hintTextColorBefore, hintTextColorAfter : $hintTextColorAfter")
-        Log.e("hintSize", "hintTextSizeBefore : $hintTextSizeBefore, hintTextSizeAfter : $hintTextSizeAfter")
-        Log.e("hintVerticalPosition", "hintTextVerticalPositionBefore : $hintTextVerticalPositionBefore, hintTextVerticalPositionAfter : $hintTextVerticalPositionAfter")
-        Log.e("hintHorizontalPosition", "hintTextHorizontalPositionBefore : $hintTextHorizontalPositionBefore, hintTextHorizontalPositionAfter : $hintTextHorizontalPositionAfter")
-        Log.e("editText", "editText : $editText, editTextColor : $editTextColor, editTextSize : $editTextSize")
+        disposable = RxView.focusChanges(et_input)
+//                .throttleFirst(animationDuration, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    setAnim(it)
+                }
         typedArray.recycle()
     }
 
-    private fun setPosition() {
+    private fun setPosition(verticalPos: Int, horizontalPos: Int, id: Int) {
         val constraintSet = ConstraintSet()
         constraintSet.clone(v_root)
-        when (hintTextVerticalPositionBefore) {
-            positionTop -> {
-                constraintSet.connect(tv_hintBefore.id, ConstraintSet.TOP, v_root.id, ConstraintSet.TOP, 0)
-                constraintSet.connect(tv_hintBefore.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP, 0)
+
+        when (verticalPos) {
+            posTop -> {
+                constraintSet.clear(id, ConstraintSet.BOTTOM)
+                constraintSet.connect(id, ConstraintSet.TOP, v_root.id, ConstraintSet.TOP, 0)
+                constraintSet.connect(v_root.id, ConstraintSet.TOP, id, ConstraintSet.TOP, 0)
+                constraintSet.connect(id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP, 0)
+                constraintSet.connect(et_input.id, ConstraintSet.TOP, id, ConstraintSet.BOTTOM, 0)
             }
-            positionBottom -> {
-                constraintSet.connect(tv_hintBefore.id, ConstraintSet.BOTTOM, v_root.id, ConstraintSet.BOTTOM, 0)
-                constraintSet.connect(tv_hintBefore.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM, 0)
+            posBottom -> {
+                constraintSet.clear(id, ConstraintSet.TOP)
+                constraintSet.connect(id, ConstraintSet.BOTTOM, v_root.id, ConstraintSet.BOTTOM, 0)
+                constraintSet.connect(v_root.id, ConstraintSet.BOTTOM, id, ConstraintSet.BOTTOM, 0)
+                constraintSet.connect(et_input.id, ConstraintSet.BOTTOM, id, ConstraintSet.TOP, 0)
+                constraintSet.connect(id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM, 0)
+            }
+            else -> {
+                constraintSet.clear(id, ConstraintSet.TOP)
+                constraintSet.clear(id, ConstraintSet.BOTTOM)
+                constraintSet.centerVertically(id, v_root.id)
+            }
+
+        }
+
+        when (horizontalPos) {
+            posStart -> {
+                constraintSet.clear(id, ConstraintSet.END)
+                constraintSet.connect(id, ConstraintSet.START, v_root.id, ConstraintSet.START, 0)
+                constraintSet.connect(v_root.id, ConstraintSet.START, id, ConstraintSet.START, 0)
+            }
+            posEnd -> {
+                constraintSet.clear(id, ConstraintSet.START)
+                constraintSet.connect(id, ConstraintSet.END, v_root.id, ConstraintSet.END, 0)
+                constraintSet.connect(v_root.id, ConstraintSet.END, id, ConstraintSet.END, 0)
+            }
+            else -> {
+                constraintSet.clear(id, ConstraintSet.START)
+                constraintSet.clear(id, ConstraintSet.END)
+                constraintSet.centerHorizontally(id, v_root.id)
             }
         }
 
-        when (hintTextVerticalPositionAfter) {
-            positionTop -> {
-                constraintSet.connect(tv_hintAfter.id, ConstraintSet.TOP, v_root.id, ConstraintSet.TOP, 0)
-                constraintSet.connect(tv_hintAfter.id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP, 0)
-            }
-            positionBottom -> {
-                constraintSet.connect(tv_hintAfter.id, ConstraintSet.BOTTOM, v_root.id, ConstraintSet.BOTTOM, 0)
-                constraintSet.connect(tv_hintAfter.id, ConstraintSet.TOP, et_input.id, ConstraintSet.BOTTOM, 0)
-            }
-        }
-
-        when (hintTextHorizontalPositionBefore) {
-            positionStart -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.START, v_root.id, ConstraintSet.START, 0)
-            positionEnd -> constraintSet.connect(tv_hintBefore.id, ConstraintSet.END, v_root.id, ConstraintSet.END, 0)
-        }
-
-        when (hintTextHorizontalPositionAfter) {
-            positionStart -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.START, v_root.id, ConstraintSet.START, 0)
-            positionEnd -> constraintSet.connect(tv_hintAfter.id, ConstraintSet.END, v_root.id, ConstraintSet.END, 0)
-        }
         constraintSet.applyTo(v_root)
-
-        disposable = RxView.focusChanges(et_input)
-                .throttleFirst(animationDuration, TimeUnit.MILLISECONDS)
-                .subscribe {
-                    setAnim(animationDuration, it)
-                }
     }
 
-    private var animatorSet = AnimatorSet()
-    private fun setAnim(duration: Long, isFocused: Boolean) {
+    private fun setAnim(isFocused: Boolean) {
+        val transition = AutoTransition()
+        transition.duration = animateDuration
+        TransitionManager.beginDelayedTransition(v_root, transition)
+//
+//        if (isFocused) {
+//            v_root.tv_hint.setTextColor(hintTextColorAfter)
+//            v_root.tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeAfter.toFloat())
+//            v_root.background = TransitionDrawable(backgroundDrawablesAfter)
+//            (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
+//
+//        } else {
+//            v_root.tv_hint.setTextColor(hintTextColorBefore)
+//            v_root.tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
+//            v_root.background = TransitionDrawable(backgroundDrawablesBefore)
+//            (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
+//
+//        }
+
+
+        val animatorSet = AnimatorSet()
         val colorAnimator = ValueAnimator()
         if (isFocused)
             colorAnimator.setIntValues(hintTextColorBefore, hintTextColorAfter)
         else
             colorAnimator.setIntValues(hintTextColorAfter, hintTextColorBefore)
         colorAnimator.setEvaluator(ArgbEvaluator())
-        colorAnimator.duration = duration
+        colorAnimator.duration = animateDuration
         colorAnimator.interpolator = DecelerateInterpolator()
         colorAnimator.addUpdateListener {
             tv_hint.setTextColor(it.animatedValue as Int)
         }
 
-        val hintSizeDifference = tv_hintBefore.textSize - tv_hintAfter.textSize
-        val hintXDifference = tv_hintBefore.x - tv_hintAfter.x
-        val hintYDifference = tv_hintBefore.y - tv_hintAfter.y
+        val hintSizeDiffer = tv_hintBefore.textSize - tv_hintAfter.textSize
 
         val scaleAnimator = if (isFocused) ValueAnimator.ofFloat(0f, 1f) else ValueAnimator.ofFloat(1f, 0f)
-//        scaleAnimator.duration = duration
-//        scaleAnimator.interpolator = DecelerateInterpolator()
-//        scaleAnimator.addUpdateListener {
-//            val floatValue = it.animatedValue as Float
-//
-//            tv_hint.textSize = tv_hintBefore.textSize - hintSizeDifference * floatValue
-////            tv_hint.textSize = hintSizeDifference * floatValue + smallSize
-//
-//            tv_hint.x = tv_hintBefore.x - hintXDifference * floatValue
-//            tv_hint.y = tv_hintBefore.y - hintYDifference * floatValue
-//        }
+        scaleAnimator.duration = animateDuration
+        scaleAnimator.interpolator = DecelerateInterpolator()
+        scaleAnimator.addUpdateListener {
+            val floatValue = it.animatedValue as Float
+            tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, tv_hintBefore.textSize - hintSizeDiffer * floatValue)
+        }
 
         animatorSet.playTogether(colorAnimator, scaleAnimator)
         animatorSet.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animation: Animator?) {
                 if (isFocused) {
-                    v_root.background = TransitionDrawable(backgroundDrawablesBefore)
-                    (v_root.background as TransitionDrawable).startTransition(duration.toInt())
-                } else {
                     v_root.background = TransitionDrawable(backgroundDrawablesAfter)
-                    (v_root.background as TransitionDrawable).startTransition(duration.toInt())
+                    (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
+
+                    val params = tv_hintAfter.layoutParams as ConstraintLayout.LayoutParams
+                    tv_hint.layoutParams = params
+                } else {
+                    v_root.background = TransitionDrawable(backgroundDrawablesBefore)
+                    (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
+
+                    val params = tv_hintBefore.layoutParams as ConstraintLayout.LayoutParams
+                    tv_hint.layoutParams = params
                 }
             }
 
@@ -241,24 +260,10 @@ class MeUEditText : ConstraintLayout {
         animatorSet.start()
     }
 
-    var disposable: Disposable? = null
+    private var disposable: Disposable? = null
     override fun onDetachedFromWindow() {
         if (disposable != null && !disposable!!.isDisposed)
             disposable?.dispose()
         super.onDetachedFromWindow()
-    }
-
-    fun getHint(): String {
-        return tv_hint.text.toString()
-    }
-
-    fun setHint(hint: String) {
-        tv_hint.text = hint
-        tv_hintBefore.text = hint
-        tv_hintAfter.text = hint
-    }
-
-    fun getEditText(): EditText {
-        return et_input
     }
 }

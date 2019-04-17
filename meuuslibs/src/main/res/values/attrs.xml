@@ -38,7 +38,7 @@
         <attr name="editText" format="reference|string" />
         <attr name="editTextColor" format="reference|color" />
         <attr name="editTextSize" format="reference|dimension" />
-        <attr name="animationDuration" format="integer" />
+        <attr name="animateDuration" format="integer" />
     </declare-styleable>
 
 
