@@ -27,11 +27,12 @@ import kotlinx.android.synthetic.main.widget_meu_edit_text.view.*
 
 class MeUEditText : ConstraintLayout {
     companion object {
-        const val posTop = -1
-        const val posBottom = 1
-        const val posStart = -1
-        const val posEnd = 1
-        const val posCenter = 0
+        const val POS_TOP = -1
+        const val POS_BOTTOM = 1
+
+        const val POS_START = -1
+        const val POS_END = 1
+        const val POS_CENTER = 0
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
@@ -75,62 +76,63 @@ class MeUEditText : ConstraintLayout {
     private var hintTextSizeBefore: Int = 15
     private var hintTextSizeAfter: Int = 15
 
-    private var hintTextVerticalPositionBefore: Int = posCenter
-    private var hintTextVerticalPositionAfter: Int = posCenter
+    private var hintTextVerticalPositionBefore: Int = POS_CENTER
+    private var hintTextVerticalPositionAfter: Int = POS_CENTER
 
-    private var hintTextHorizontalPositionBefore: Int = posCenter
-    private var hintTextHorizontalPositionAfter: Int = posCenter
+    private var hintTextHorizontalPositionBefore: Int = POS_CENTER
+    private var hintTextHorizontalPositionAfter: Int = POS_CENTER
 
     private var animateDuration: Long = 100
 
     private fun setTypeArray(typedArray: TypedArray) {
         backgroundBefore = typedArray.getResourceId(R.styleable.MeUEditText_backgroundBefore, R.drawable.background_underline_black)
         backgroundAfter = typedArray.getResourceId(R.styleable.MeUEditText_backgroundAfter, backgroundBefore)
+
         backgroundDrawablesBefore = arrayOf(getDrawable(context, backgroundBefore)!!, getDrawable(context, backgroundAfter)!!)
         backgroundDrawablesAfter = arrayOf(getDrawable(context, backgroundAfter)!!, getDrawable(context, backgroundBefore)!!)
-        v_root.background = TransitionDrawable(backgroundDrawablesBefore)
-
-        //HintText
-        val hintText = typedArray.getString(R.styleable.MeUEditText_hintText)
-        tv_hintBefore.text = hintText
-        tv_hintAfter.text = hintText
-        tv_hint.text = hintText
 
         hintTextColorBefore = typedArray.getColor(R.styleable.MeUEditText_hintTextColorBefore, ContextCompat.getColor(context, R.color.colorBlack))
-        tv_hintBefore.setTextColor(hintTextColorBefore)
         hintTextColorAfter = typedArray.getColor(R.styleable.MeUEditText_hintTextColorAfter, hintTextColorBefore)
-        tv_hintAfter.setTextColor(hintTextColorAfter)
-        tv_hint.setTextColor(hintTextColorBefore)
 
         hintTextSizeBefore = typedArray.getDimensionPixelSize(R.styleable.MeUEditText_hintTextSizeBefore, dpToPx(context, 15))
-        tv_hintBefore.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
         hintTextSizeAfter = typedArray.getDimensionPixelSize(R.styleable.MeUEditText_hintTextSizeAfter, hintTextSizeBefore)
-        tv_hintAfter.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeAfter.toFloat())
-        tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
 
-        hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, posCenter)
+        hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, POS_CENTER)
         hintTextVerticalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionAfter, hintTextVerticalPositionBefore)
 
-        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, posCenter)
+        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, POS_CENTER)
         hintTextHorizontalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionAfter, hintTextHorizontalPositionBefore)
 
         animateDuration = typedArray.getInt(R.styleable.MeUEditText_animateDuration, 100).toLong()
 
-        //EditText
+        val hintText = typedArray.getString(R.styleable.MeUEditText_hintText)
         val editText = typedArray.getString(R.styleable.MeUEditText_editText)
-        et_input.setText(editText ?: "")
-
         val editTextColor = typedArray.getColor(R.styleable.MeUEditText_editTextColor, ContextCompat.getColor(context, R.color.colorBlack))
-        et_input.setTextColor(editTextColor)
-
         val editTextSize = typedArray.getDimensionPixelSize(R.styleable.MeUEditText_editTextSize, dpToPx(context, 15))
+
+        v_root.background = TransitionDrawable(backgroundDrawablesBefore)
+
+        tv_hintBefore.text = hintText
+        tv_hintAfter.text = hintText
+
+        tv_hintBefore.setTextColor(hintTextColorBefore)
+        tv_hintAfter.setTextColor(hintTextColorAfter)
+
+        tv_hintBefore.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
+        tv_hintAfter.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeAfter.toFloat())
+
+        tv_hint.text = hintText
+        tv_hint.setTextColor(hintTextColorBefore)
+        tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
+
+        et_input.setText(editText ?: "")
+        et_input.setTextColor(editTextColor)
         et_input.setTextSize(TypedValue.COMPLEX_UNIT_PX, editTextSize.toFloat())
 
         setPosition(hintTextVerticalPositionBefore, hintTextHorizontalPositionBefore, tv_hintBefore.id)
         setPosition(hintTextVerticalPositionAfter, hintTextHorizontalPositionAfter, tv_hintAfter.id)
 
         disposable = RxView.focusChanges(et_input)
-//                .throttleFirst(animationDuration, TimeUnit.MILLISECONDS)
                 .subscribe {
                     setAnim(it)
                 }
@@ -142,14 +144,14 @@ class MeUEditText : ConstraintLayout {
         constraintSet.clone(v_root)
 
         when (verticalPos) {
-            posTop -> {
+            POS_TOP -> {
                 constraintSet.clear(id, ConstraintSet.BOTTOM)
                 constraintSet.connect(id, ConstraintSet.TOP, v_root.id, ConstraintSet.TOP, 0)
                 constraintSet.connect(v_root.id, ConstraintSet.TOP, id, ConstraintSet.TOP, 0)
                 constraintSet.connect(id, ConstraintSet.BOTTOM, et_input.id, ConstraintSet.TOP, 0)
                 constraintSet.connect(et_input.id, ConstraintSet.TOP, id, ConstraintSet.BOTTOM, 0)
             }
-            posBottom -> {
+            POS_BOTTOM -> {
                 constraintSet.clear(id, ConstraintSet.TOP)
                 constraintSet.connect(id, ConstraintSet.BOTTOM, v_root.id, ConstraintSet.BOTTOM, 0)
                 constraintSet.connect(v_root.id, ConstraintSet.BOTTOM, id, ConstraintSet.BOTTOM, 0)
@@ -165,12 +167,12 @@ class MeUEditText : ConstraintLayout {
         }
 
         when (horizontalPos) {
-            posStart -> {
+            POS_START -> {
                 constraintSet.clear(id, ConstraintSet.END)
                 constraintSet.connect(id, ConstraintSet.START, v_root.id, ConstraintSet.START, 0)
                 constraintSet.connect(v_root.id, ConstraintSet.START, id, ConstraintSet.START, 0)
             }
-            posEnd -> {
+            POS_END -> {
                 constraintSet.clear(id, ConstraintSet.START)
                 constraintSet.connect(id, ConstraintSet.END, v_root.id, ConstraintSet.END, 0)
                 constraintSet.connect(v_root.id, ConstraintSet.END, id, ConstraintSet.END, 0)
@@ -189,21 +191,6 @@ class MeUEditText : ConstraintLayout {
         val transition = AutoTransition()
         transition.duration = animateDuration
         TransitionManager.beginDelayedTransition(v_root, transition)
-//
-//        if (isFocused) {
-//            v_root.tv_hint.setTextColor(hintTextColorAfter)
-//            v_root.tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeAfter.toFloat())
-//            v_root.background = TransitionDrawable(backgroundDrawablesAfter)
-//            (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
-//
-//        } else {
-//            v_root.tv_hint.setTextColor(hintTextColorBefore)
-//            v_root.tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSizeBefore.toFloat())
-//            v_root.background = TransitionDrawable(backgroundDrawablesBefore)
-//            (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
-//
-//        }
-
 
         val animatorSet = AnimatorSet()
         val colorAnimator = ValueAnimator()
@@ -272,4 +259,8 @@ class MeUEditText : ConstraintLayout {
             disposable?.dispose()
         super.onDetachedFromWindow()
     }
+
+    //todo : make setter
+
+    //todo : consider center position
 }
