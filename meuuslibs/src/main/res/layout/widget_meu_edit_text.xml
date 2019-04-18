@@ -16,12 +16,14 @@
         android:id="@+id/tv_hintBefore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         tools:text="hint" />
 
     <TextView
         android:id="@+id/tv_hintAfter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         tools:text="hint" />
 
     <EditText

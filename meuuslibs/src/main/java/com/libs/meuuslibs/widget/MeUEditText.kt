@@ -218,14 +218,26 @@ class MeUEditText : ConstraintLayout {
             tv_hint.setTextColor(it.animatedValue as Int)
         }
 
-        val hintSizeDiffer = tv_hintBefore.textSize - tv_hintAfter.textSize
+        val scaleAnimator =
+                if (isFocused) ValueAnimator.ofFloat(tv_hintBefore.textSize, tv_hintAfter.textSize)
+                else ValueAnimator.ofFloat(tv_hintAfter.textSize, tv_hintBefore.textSize)
 
-        val scaleAnimator = if (isFocused) ValueAnimator.ofFloat(0f, 1f) else ValueAnimator.ofFloat(1f, 0f)
         scaleAnimator.duration = animateDuration
-        scaleAnimator.interpolator = DecelerateInterpolator()
         scaleAnimator.addUpdateListener {
             val floatValue = it.animatedValue as Float
-            tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, tv_hintBefore.textSize - hintSizeDiffer * floatValue)
+            tv_hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, floatValue)
+
+            if (isFocused) {
+                val params = tv_hintAfter.layoutParams as ConstraintLayout.LayoutParams
+                params.width = ConstraintLayout.LayoutParams.WRAP_CONTENT
+                params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT
+                tv_hint.layoutParams = params
+            } else {
+                val params = tv_hintBefore.layoutParams as ConstraintLayout.LayoutParams
+                params.width = ConstraintLayout.LayoutParams.WRAP_CONTENT
+                params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT
+                tv_hint.layoutParams = params
+            }
         }
 
         animatorSet.playTogether(colorAnimator, scaleAnimator)
@@ -234,15 +246,9 @@ class MeUEditText : ConstraintLayout {
                 if (isFocused) {
                     v_root.background = TransitionDrawable(backgroundDrawablesAfter)
                     (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
-
-                    val params = tv_hintAfter.layoutParams as ConstraintLayout.LayoutParams
-                    tv_hint.layoutParams = params
                 } else {
                     v_root.background = TransitionDrawable(backgroundDrawablesBefore)
                     (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
-
-                    val params = tv_hintBefore.layoutParams as ConstraintLayout.LayoutParams
-                    tv_hint.layoutParams = params
                 }
             }
 
