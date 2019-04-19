@@ -12,6 +12,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -21,7 +22,7 @@ import androidx.transition.TransitionManager
 import com.jakewharton.rxbinding2.view.RxView
 import com.libs.meuuslibs.R
 import com.libs.meuuslibs.util.ConvertMetrics.Companion.dpToPx
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.widget_meu_edit_text.view.*
 
 
@@ -33,6 +34,11 @@ class MeUEditText : ConstraintLayout {
         const val POS_START = -1
         const val POS_END = 1
         const val POS_CENTER = 0
+
+        const val ANIMATE_NEVER = -1
+        const val ANIMATE_ALWAYS = 0
+        const val ANIMATE_FIRST_TIME = 1
+        const val ANIMATE_ON_NO_TEXT = 2
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
@@ -65,6 +71,8 @@ class MeUEditText : ConstraintLayout {
         setTypeArray(typedArray)
     }
 
+    private var rootView = this
+
     private var backgroundBefore: Int = R.drawable.background_underline_black
     private var backgroundAfter: Int = R.drawable.background_underline_black
     private var backgroundDrawablesBefore: Array<Drawable>? = arrayOf(getDrawable(context, backgroundBefore)!!, getDrawable(context, backgroundAfter)!!)
@@ -84,6 +92,9 @@ class MeUEditText : ConstraintLayout {
 
     private var animateDuration: Long = 100
 
+    private var animateState: Int = ANIMATE_ALWAYS
+    private var animateStarted = false
+
     private fun setTypeArray(typedArray: TypedArray) {
         backgroundBefore = typedArray.getResourceId(R.styleable.MeUEditText_backgroundBefore, R.drawable.background_underline_black)
         backgroundAfter = typedArray.getResourceId(R.styleable.MeUEditText_backgroundAfter, backgroundBefore)
@@ -98,19 +109,21 @@ class MeUEditText : ConstraintLayout {
         hintTextSizeAfter = typedArray.getDimensionPixelSize(R.styleable.MeUEditText_hintTextSizeAfter, hintTextSizeBefore)
 
         hintTextVerticalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionBefore, POS_CENTER)
-        hintTextVerticalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionAfter, hintTextVerticalPositionBefore)
+        hintTextVerticalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextVerticalPositionAfter, POS_TOP)
 
-        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, POS_CENTER)
+        hintTextHorizontalPositionBefore = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionBefore, POS_START)
         hintTextHorizontalPositionAfter = typedArray.getInt(R.styleable.MeUEditText_hintTextHorizontalPositionAfter, hintTextHorizontalPositionBefore)
 
         animateDuration = typedArray.getInt(R.styleable.MeUEditText_animateDuration, 100).toLong()
+
+        animateState = typedArray.getInt(R.styleable.MeUEditText_animateState, ANIMATE_ALWAYS)
 
         val hintText = typedArray.getString(R.styleable.MeUEditText_hintText)
         val editText = typedArray.getString(R.styleable.MeUEditText_editText)
         val editTextColor = typedArray.getColor(R.styleable.MeUEditText_editTextColor, ContextCompat.getColor(context, R.color.colorBlack))
         val editTextSize = typedArray.getDimensionPixelSize(R.styleable.MeUEditText_editTextSize, dpToPx(context, 15))
 
-        v_root.background = TransitionDrawable(backgroundDrawablesBefore)
+        rootView.background = TransitionDrawable(backgroundDrawablesBefore)
 
         tv_hintBefore.text = hintText
         tv_hintAfter.text = hintText
@@ -132,10 +145,6 @@ class MeUEditText : ConstraintLayout {
         setPosition(hintTextVerticalPositionBefore, hintTextHorizontalPositionBefore, tv_hintBefore.id)
         setPosition(hintTextVerticalPositionAfter, hintTextHorizontalPositionAfter, tv_hintAfter.id)
 
-        disposable = RxView.focusChanges(et_input)
-                .subscribe {
-                    setAnim(it)
-                }
         typedArray.recycle()
     }
 
@@ -187,7 +196,7 @@ class MeUEditText : ConstraintLayout {
         constraintSet.applyTo(v_root)
     }
 
-    private fun setAnim(isFocused: Boolean) {
+    private fun startAnim(isFocused: Boolean) {
         val transition = AutoTransition()
         transition.duration = animateDuration
         TransitionManager.beginDelayedTransition(v_root, transition)
@@ -231,11 +240,11 @@ class MeUEditText : ConstraintLayout {
         animatorSet.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animation: Animator?) {
                 if (isFocused) {
-                    v_root.background = TransitionDrawable(backgroundDrawablesAfter)
-                    (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
+                    rootView.background = TransitionDrawable(backgroundDrawablesAfter)
+                    (rootView.background as TransitionDrawable).startTransition(animateDuration.toInt())
                 } else {
-                    v_root.background = TransitionDrawable(backgroundDrawablesBefore)
-                    (v_root.background as TransitionDrawable).startTransition(animateDuration.toInt())
+                    rootView.background = TransitionDrawable(backgroundDrawablesBefore)
+                    (rootView.background as TransitionDrawable).startTransition(animateDuration.toInt())
                 }
             }
 
@@ -253,14 +262,47 @@ class MeUEditText : ConstraintLayout {
         animatorSet.start()
     }
 
-    private var disposable: Disposable? = null
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        _disposables = CompositeDisposable()
+
+        _disposables!!.add(RxView.focusChanges(et_input)
+                .subscribe {
+                    when (animateState) {
+                        ANIMATE_NEVER -> return@subscribe
+                        ANIMATE_ALWAYS -> startAnim(it)
+                        ANIMATE_ON_NO_TEXT -> {
+                            if (et_input.text.isNullOrEmpty()) startAnim(it)
+                            else return@subscribe
+                        }
+                        ANIMATE_FIRST_TIME -> {
+                            if (it && !animateStarted) {
+                                animateStarted = true
+                                startAnim(it)
+                            } else return@subscribe
+                        }
+                    }
+
+                    if (it) {
+                        val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY)
+                    }
+                })
+
+        _disposables!!.add(RxView.clicks(v_root)
+                .subscribe {
+                    et_input.requestFocus()
+                })
+    }
+
+    private var _disposables: CompositeDisposable? = null
     override fun onDetachedFromWindow() {
-        if (disposable != null && !disposable!!.isDisposed)
-            disposable?.dispose()
+        if (_disposables != null && !_disposables!!.isDisposed)
+            _disposables?.dispose()
         super.onDetachedFromWindow()
     }
 
-    //todo : make setter
+//todo : make setter
 
-    //todo : consider center position
+//todo : consider center position
 }

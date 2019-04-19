@@ -39,6 +39,13 @@
         <attr name="editTextColor" format="reference|color" />
         <attr name="editTextSize" format="reference|dimension" />
         <attr name="animateDuration" format="integer" />
+
+        <attr name="animateState" format="enum" >
+            <enum name="never" value="-1" />
+            <enum name="always" value="0" />
+            <enum name="firstTime" value="1" />
+            <enum name="onNoText" value="2" />
+        </attr>
     </declare-styleable>
 
 

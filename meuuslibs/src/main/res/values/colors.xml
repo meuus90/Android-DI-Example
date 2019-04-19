@@ -8,4 +8,5 @@
     <color name="colorYellow">#ffd103</color>
     <color name="colorBlue">#3F51B5</color>
     <color name="colorBlueGreen">#24a9e1</color>
+    <color name="colorTransparent">#00000000</color>
 </resources>

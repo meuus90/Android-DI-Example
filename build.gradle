@@ -36,6 +36,8 @@ ext {
     rxJava = "2.1.15"
     rxkotlin = "2.2.0"
     rxAndroid = "2.0.2"
+    retrofit2 = "2.3.0"
+    okhttp3 = "3.10.0"
 
 //    fastSdkVersion = 21
 //    firebase_core = "16.0.3"
@@ -46,8 +48,6 @@ ext {
 //    supportLibVersion = "28.0.0"
 //    gson = "2.8.5"
 //    glide = "4.7.1"
-//    retrofit2 = "2.3.0"
-//    okhttp3 = "3.10.0"
 //    junitVersion = '4.12'
 //    mockitoVersion = '2.15.0'
 //    robolectricVersion = '4.0.2'

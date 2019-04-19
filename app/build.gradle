@@ -33,7 +33,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha04'
     implementation project(':meuuslibs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
@@ -47,4 +47,15 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:' + rootProject.ext.rxJava
     implementation 'io.reactivex.rxjava2:rxandroid:' + rootProject.ext.rxAndroid
     implementation 'io.reactivex.rxjava2:rxkotlin:' + rootProject.ext.rxkotlin
+
+    /**
+     * Network
+     */
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofit2"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofit2"
+    implementation "com.squareup.retrofit2:converter-scalars:$rootProject.retrofit2"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.retrofit2"
+    implementation "com.squareup.retrofit2:retrofit-mock:$rootProject.retrofit2"
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.okhttp3"
+    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okhttp3"
 }

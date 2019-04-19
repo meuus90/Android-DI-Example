@@ -1,33 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBlack"
+    android:background="@color/colorBlueGreen"
     android:orientation="vertical">
 
-    <com.libs.meuuslibs.widget.MeUEditText
-        android:id="@+id/et_test1"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:background="@color/colorWhite"
-        app:hintText="hint1" />
+    <Button
+        android:id="@+id/b_gotoEditTextSample"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="20dp"
+        android:text="EditTextSample" />
 
-    <com.libs.meuuslibs.widget.MeUEditText
-        android:id="@+id/et_test2"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="50dp"
-        app:animateDuration="1000"
-        app:backgroundAfter="@drawable/background_underline_y"
-        app:backgroundBefore="@drawable/background_underline_w"
-        app:hintText="hint2"
-        app:hintTextColorAfter="@color/colorGray"
-        app:hintTextColorBefore="@color/colorBlack"
-        app:hintTextHorizontalPositionAfter="end"
-        app:hintTextHorizontalPositionBefore="start"
-        app:hintTextSizeAfter="10sp"
-        app:hintTextSizeBefore="15sp"
-        app:hintTextVerticalPositionAfter="bottom"
-        app:hintTextVerticalPositionBefore="top" />
+    <Button
+        android:id="@+id/b_gotoNetworkSample"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="20dp"
+        android:text="NetworkSample" />
+
 </LinearLayout>
