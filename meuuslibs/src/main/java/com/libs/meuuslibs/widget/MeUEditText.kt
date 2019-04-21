@@ -303,6 +303,4 @@ class MeUEditText : ConstraintLayout {
     }
 
 //todo : make setter
-
-//todo : consider center position
 }

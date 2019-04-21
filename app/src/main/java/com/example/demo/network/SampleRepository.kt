@@ -14,6 +14,15 @@ import okhttp3.Request
 import okhttp3.Response
 
 class SampleRepository(val rootApplication: Application, val activity: Activity) : RootRepository(rootApplication), APISample {
+    override fun getSampleList(): Single<Any> {
+        return makeResponse(createService(APISample::class.java).getSampleList(),
+                object : RootRepository.ServiceProvider {
+                    override fun onService(it: Any): Any {
+
+                        return it
+                    }
+                })
+    }
 
     override fun getSample(query: String): Single<Any> {
         return makeResponse(createService(APISample::class.java).getSample(query),
@@ -48,7 +57,7 @@ class SampleRepository(val rootApplication: Application, val activity: Activity)
     override fun setNetworkSetting(): NetworkInterface {
         return object : NetworkInterface {
             override fun setServerUrl(): String {
-                return ""
+                return "http://meuus.sample.com/"
             }
 
             override fun setPrintLog(): Boolean {
