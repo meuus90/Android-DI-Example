@@ -2,6 +2,7 @@ package com.libs.meuuslibs.network
 
 import android.app.Application
 import com.google.common.base.Preconditions
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -13,7 +14,7 @@ open class BaseRepository(rootApplication: Application) {
         Preconditions.checkNotNull(rootApplication, "RootApplication cannot be null")
     }
 
-    interface ServiceProvider<T> {
+    interface SingleProvider<T> {
         fun onService(it: T): T
     }
 
@@ -28,12 +29,18 @@ open class BaseRepository(rootApplication: Application) {
         return mRequestMaker!!.createService(serviceClass)
     }
 
-    fun <T> makeResponse(service: Single<T>, response: ServiceProvider<T>): Single<T> {
+    fun <T> makeSingleResponse(service: Single<T>, response: SingleProvider<T>): Single<T> {
         return service
                 .subscribeOn(Schedulers.io())
                 .map {
                     response.onService(it) ?: it
                 }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun makeCompletableResponse(service: Completable): Completable {
+        return service
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 

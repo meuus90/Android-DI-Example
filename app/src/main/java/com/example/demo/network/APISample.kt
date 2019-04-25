@@ -1,5 +1,6 @@
 package com.example.demo.network
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.*
 
@@ -13,4 +14,7 @@ interface APISample {
     @FormUrlEncoded
     @POST("/")
     fun postSampleWithField(@Field("field") field: String): Single<DUser>
+
+    @HTTP(method = "DELETE", path = "/users", hasBody = true)
+    fun deleteUser(@Body password: String): Completable
 }
