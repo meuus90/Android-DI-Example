@@ -13,8 +13,8 @@ open class BaseRepository(rootApplication: Application) {
         Preconditions.checkNotNull(rootApplication, "RootApplication cannot be null")
     }
 
-    interface ServiceProvider<R> {
-        fun onService(it: R): R
+    interface ServiceProvider<T> {
+        fun onService(it: T): T
     }
 
     fun resetService() {
