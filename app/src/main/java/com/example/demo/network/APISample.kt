@@ -5,12 +5,12 @@ import retrofit2.http.*
 
 interface APISample {
     @GET("/")
-    fun getSample(@Query("query") query: String): Single<Any>
+    fun getSample(@Query("query") query: String): Single<ArrayList<DUser>>
 
     @POST("/")
-    fun postSample(@Body body: Any): Single<Any>
+    fun postSample(@Body body: Any): Single<DUser>
 
     @FormUrlEncoded
     @POST("/")
-    fun postSampleWithField(@Field("field") field: String): Single<Any>
+    fun postSampleWithField(@Field("field") field: String): Single<DUser>
 }

@@ -19,7 +19,7 @@ import java.lang.reflect.Modifier
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 
-class RequestMaker(private var networkSetting: NetworkInterface) {
+class RequestMaker(private var networkSetting: NetworkSetting) {
     private var okHttpClient: OkHttpClient? = null
     private var dispatcher: Dispatcher? = null
     private var builder: Retrofit.Builder? = null
@@ -159,7 +159,7 @@ class RequestMaker(private var networkSetting: NetworkInterface) {
         const val PRETTY_LOGGER = "PRETTY_LOGGER"
     }
 
-    internal class ReceivedCookiesInterceptor(private var networkSetting: NetworkInterface) : Interceptor {
+    internal class ReceivedCookiesInterceptor(private var networkSetting: NetworkSetting) : Interceptor {
         @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain): Response {
             val originalResponse = chain.proceed(chain.request())

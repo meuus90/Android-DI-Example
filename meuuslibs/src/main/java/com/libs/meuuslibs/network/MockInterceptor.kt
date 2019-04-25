@@ -6,7 +6,7 @@ import okhttp3.Response
 import java.io.IOException
 import java.util.*
 
-class MockInterceptor(private var networkSetting: NetworkInterface) : Interceptor {
+class MockInterceptor(private var networkSetting: NetworkSetting) : Interceptor {
 
     private val events = ArrayDeque<Any>()
     private val requests = ArrayDeque<Request>()

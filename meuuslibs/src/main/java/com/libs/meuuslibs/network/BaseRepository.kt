@@ -8,13 +8,13 @@ import io.reactivex.schedulers.Schedulers
 import okhttp3.Request
 import okhttp3.Response
 
-open class RootRepository(rootApplication: Application) {
+open class BaseRepository(rootApplication: Application) {
     init {
         Preconditions.checkNotNull(rootApplication, "RootApplication cannot be null")
     }
 
-    interface ServiceProvider {
-        fun onService(it: Any): Any
+    interface ServiceProvider<R> {
+        fun onService(it: R): R
     }
 
     fun resetService() {
@@ -28,17 +28,17 @@ open class RootRepository(rootApplication: Application) {
         return mRequestMaker!!.createService(serviceClass)
     }
 
-    fun makeResponse(service: Single<Any>, response: ServiceProvider?): Single<Any> {
+    fun <T> makeResponse(service: Single<T>, response: ServiceProvider<T>): Single<T> {
         return service
                 .subscribeOn(Schedulers.io())
                 .map {
-                    response?.onService(it) ?: it
+                    response.onService(it) ?: it
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    open fun setNetworkSetting(): NetworkInterface {
-        return object : NetworkInterface {
+    open fun setNetworkSetting(): NetworkSetting {
+        return object : NetworkSetting {
             override fun setServerUrl(): String {
                 return ""
             }

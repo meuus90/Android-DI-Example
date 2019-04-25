@@ -2,83 +2,33 @@ package com.example.demo.network
 
 import android.app.Activity
 import android.app.Application
-import android.content.Context
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import com.example.demo.ui.NetworkSampleActivity
-import com.libs.meuuslibs.network.NetworkInterface
-import com.libs.meuuslibs.network.RootRepository
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.activity_network_sample.*
-import okhttp3.Request
-import okhttp3.Response
 
-class SampleRepository(val rootApplication: Application, val activity: Activity) : RootRepository(rootApplication), APISample {
-
-    override fun getSample(query: String): Single<Any> {
+class SampleRepository(rootApplication: Application, activity: Activity) : RootRepository(rootApplication, activity), APISample {
+    override fun getSample(query: String): Single<ArrayList<DUser>> {
         return makeResponse(createService(APISample::class.java).getSample(query),
-                object : RootRepository.ServiceProvider {
-                    override fun onService(it: Any): Any {
-
+                object : ServiceProvider<ArrayList<DUser>> {
+                    override fun onService(it: ArrayList<DUser>): ArrayList<DUser> {
                         return it
                     }
                 })
     }
 
-    override fun postSample(body: Any): Single<Any> {
+    override fun postSample(body: Any): Single<DUser> {
         return makeResponse(createService(APISample::class.java).postSample(body),
-                object : RootRepository.ServiceProvider {
-                    override fun onService(it: Any): Any {
-
+                object : ServiceProvider<DUser> {
+                    override fun onService(it: DUser): DUser {
                         return it
                     }
                 })
     }
 
-    override fun postSampleWithField(field: String): Single<Any> {
+    override fun postSampleWithField(field: String): Single<DUser> {
         return makeResponse(createService(APISample::class.java).postSampleWithField(field),
-                object : RootRepository.ServiceProvider {
-                    override fun onService(it: Any): Any {
-
+                object : ServiceProvider<DUser> {
+                    override fun onService(it: DUser): DUser {
                         return it
                     }
                 })
-    }
-
-    override fun setNetworkSetting(): NetworkInterface {
-        return object : NetworkInterface {
-            override fun setServerUrl(): String {
-                return ""
-            }
-
-            override fun setPrintLog(): Boolean {
-                return true
-            }
-
-            override fun setHeaderBuilder(headerBuilder: Request.Builder): Request.Builder {
-                headerBuilder.header("Version", getAppVersionCode(rootApplication))
-                headerBuilder.header("Accept", "application/json")
-                return headerBuilder
-            }
-
-            override fun setResponse(response: Response) {
-            }
-
-            override fun setErrorHandler(body: String) {
-                (activity as NetworkSampleActivity).contents.text = body
-            }
-        }
-    }
-
-    private fun getAppVersionCode(context: Context): String {
-        val packageInfo: PackageInfo
-        try {
-            packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            return "android:" + packageInfo.versionCode + ":" + packageInfo.versionName
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-        }
-
-        return ""
     }
 }
