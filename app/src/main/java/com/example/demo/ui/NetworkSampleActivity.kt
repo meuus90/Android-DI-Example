@@ -16,7 +16,8 @@ class NetworkSampleActivity : AppCompatActivity() {
         _disposables = CompositeDisposable()
 
         button.setOnClickListener {
-            _disposables!!.add(SampleRepository(application, this).getSample("")
+            _disposables!!.add(SampleRepository(application, this)
+                    .getSampleList()
                     .subscribe({
                         contents.text = it.toString()
                     }, {
