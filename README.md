@@ -1,10 +1,13 @@
 # Overview #
-### Sample codes on This Android project
-- Dependency Injection (DI)
-- Repositories : Local Repository, Remote(Server) Repository
-- MVVM : 
+This sample source provides a way to create an Android project using DI and MVVM.
 
-## Libraries
+## Sample codes on This Android project
+- Dependency Injection (DI)
+- MVVM
+- Repositories : Local Repository, Remote(Server) Repository
+- Test Codes
+
+## Libraries used by this project
 ### Kotlin
 org.jetbrains.kotlin:kotlin-stdlib-jdk7
 
@@ -72,5 +75,3 @@ com.jakewharton.rxrelay2:rxrelay
 ### Debuging Network & Resources
 com.facebook.stetho:stetho
 com.facebook.stetho:stetho-okhttp3
-    
-# aa
