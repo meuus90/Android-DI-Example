@@ -1,17 +1,32 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.meuuslibs.demo"
+//        applicationId "com.example.meuuslibs.demo"
         minSdkVersion 18
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
+
+    android {
+        sourceSets {
+            String sharedTestDir = 'src/sharedTest/java'
+            test {
+                java.srcDir sharedTestDir
+            }
+            androidTest {
+                java.srcDir sharedTestDir
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -23,6 +38,20 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    flavorDimensions "default"
+    productFlavors {
+        prod {
+            dimension "default"
+            manifestPlaceholders = [appNameGradle: "PROD"]
+        }
+
+        dev {
+            dimension "default"
+            applicationIdSuffix = ".dev"
+            manifestPlaceholders = [appNameGradle: "DEV"]
+        }
+    }
 }
 
 configurations {
@@ -31,31 +60,102 @@ configurations {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha04'
-    implementation project(':meuuslibs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    debugImplementation 'androidx.fragment:fragment-testing:1.1.0-alpha06'
+
+    // Dependencies for local unit tests
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:2.25.0"
+    testImplementation "android.arch.core:core-testing:1.1.1"
+    //testImplementation 'androidx.test.ext:junit:1.1.0'
+
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.1"
+//    androidTestImplementation "junit:junit:4.12"
+
+    // Dependencies for Android unit tests
+    androidTestImplementation "org.mockito:mockito-core:2.25.0"
+
+    // Android Testing Support Library - Instrumented testing
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation "com.google.guava:guava:27.1-jre"
+
+    //api 'com.google.guava:guava:27.1-android'
 
     /**
-     * Rx
+     * Google Support Libraries
      */
-    implementation 'io.reactivex.rxjava2:rxjava:' + rootProject.ext.rxJava
-    implementation 'io.reactivex.rxjava2:rxandroid:' + rootProject.ext.rxAndroid
-    implementation 'io.reactivex.rxjava2:rxkotlin:' + rootProject.ext.rxkotlin
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.legacy:legacy-support-core-ui:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
+    implementation 'androidx.vectordrawable:vectordrawable:1.0.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha07'
+    implementation 'com.hootsuite.android:nachos:1.1.1'                // material chips
+
+    /**
+     * Multi-Dex
+     */
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    /**
+     * Architecture Component
+     */
+    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.0.0"
 
     /**
      * Network
      */
-    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofit2"
-    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofit2"
-    implementation "com.squareup.retrofit2:converter-scalars:$rootProject.retrofit2"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.retrofit2"
-    implementation "com.squareup.retrofit2:retrofit-mock:$rootProject.retrofit2"
-    implementation "com.squareup.okhttp3:okhttp:$rootProject.okhttp3"
-    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okhttp3"
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit2"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit2"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit2"
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp3"
+    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okhttp3"
+
+    /**
+     * Rx
+     */
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxJava"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxAndroid"
+    implementation "io.reactivex.rxjava2:rxkotlin:$rootProject.ext.rxkotlin"
+
+    /**
+     * Glide(Image library)
+     */
+    implementation "com.github.bumptech.glide:glide:4.9.0"
+    implementation "com.github.bumptech.glide:annotations:4.9.0"
+    kapt "com.github.bumptech.glide:compiler:4.9.0"
+
+    /**
+     * Json Logging
+     */
+    implementation 'com.orhanobut:logger:2.2.0'
+
+    /**
+     * Dagger2
+     */
+    kapt "com.google.dagger:dagger-compiler:2.22.1"
+    kapt "com.google.dagger:dagger-android-processor:2.22.1"
+
+    implementation "com.google.dagger:dagger:2.22.1"
+    implementation "com.google.dagger:dagger-android:2.22.1"
+    implementation "com.google.dagger:dagger-android-support:2.22.1"
+
+    /**
+     * Rx Utils
+     */
+    implementation "com.jakewharton.rxbinding2:rxbinding:2.1.1"
+    implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
+    /**
+     * Debuging Network & Resources
+     */
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 }
