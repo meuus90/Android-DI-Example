@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/DI-Sample-Android.iml" filepath="$PROJECT_DIR$/DI-Sample-Android.iml" group="DI-Sample-Android" />
+      <module fileurl="file://$PROJECT_DIR$/app/DI-Sample-Android-app.iml" filepath="$PROJECT_DIR$/app/DI-Sample-Android-app.iml" group="DI-Sample-Android/app" />
       <module fileurl="file://$PROJECT_DIR$/DependencyInjectionSample.iml" filepath="$PROJECT_DIR$/DependencyInjectionSample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

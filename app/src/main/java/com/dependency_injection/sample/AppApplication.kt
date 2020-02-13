@@ -2,70 +2,89 @@ package com.dependency_injection.sample
 
 import android.app.Activity
 import android.app.Application
+import android.content.ComponentCallbacks2
 import android.content.Context
-import android.util.Log
+import android.content.res.Configuration
+import android.os.Build
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDex
-import com.dependency_injection.sample.di.DaggerAppComponent
+import com.bumptech.glide.Glide
+import com.dependency_injection.sample.di.helper.AppInjector
+import com.example.demo.BuildConfig
+import com.facebook.stetho.Stetho
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
-import io.reactivex.plugins.RxJavaPlugins.setErrorHandler
-import java.io.IOException
-import java.net.SocketException
+import dagger.android.HasAndroidInjector
+import net.danlew.android.joda.JodaTimeAndroid
+import timber.log.Timber
 import javax.inject.Inject
+import kotlin.system.exitProcess
 
 
-class AppApplication : Application(), HasActivityInjector {
+class AppApplication : Application(), CameraXConfig.Provider, LifecycleObserver, HasAndroidInjector {
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
-    override fun activityInjector(): AndroidInjector<Activity> = dispatchingAndroidInjector
+    internal var isInForeground = false
 
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
-        MultiDex.install(this)
+    companion object {
+        fun exitApplication(activity: Activity) {
+            ActivityCompat.finishAffinity(activity)
+            exit()
+        }
+
+        private fun exit() {
+            android.os.Process.killProcess(android.os.Process.myPid())
+            System.runFinalizersOnExit(true)
+            exitProcess(0)
+        }
     }
 
     override fun onCreate() {
         super.onCreate()
 
+        if ("robolectric" != Build.FINGERPRINT && BuildConfig.DEBUG)
+            Stetho.initializeWithDefaults(this)
+
+        JodaTimeAndroid.init(this)
         Logger.addLogAdapter(AndroidLogAdapter())
 
-        DaggerAppComponent
-                .builder()
-                .applicationBind(this)
-                .build()
-                .inject(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        AppInjector.init(this)
+    }
 
-        setErrorHandler { e ->
-            //            var error = e
-//            if (e is UndeliverableException) {
-//                error = e.cause
-//                return@setErrorHandler
-//            }
-            if (e is IOException || e is SocketException) {
-                // fine, irrelevant network problem or API that throws on cancellation
-                return@setErrorHandler
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+
+        MultiDex.install(this)
+    }
+
+    /** @returns Camera2 default configuration */
+    override fun getCameraXConfig(): CameraXConfig {
+        return Camera2Config.defaultConfig()
+    }
+
+    override fun androidInjector() = dispatchingAndroidInjector
+
+    class ShareableAssetComponentCallback(private val app: AppApplication) : ComponentCallbacks2 {
+        override fun onConfigurationChanged(newConfig: Configuration?) {}
+
+        override fun onTrimMemory(level: Int) {
+            Glide.get(app).trimMemory(level)
+            if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+                app.isInForeground = true
             }
-            if (e is InterruptedException) {
-                // fine, some blocking code was interrupted by a dispose call
-                return@setErrorHandler
-            }
-            if (e is NullPointerException || e is IllegalArgumentException) {
-                // that's likely a bug in the application
-                Thread.currentThread().uncaughtExceptionHandler
-                        .uncaughtException(Thread.currentThread(), e)
-                return@setErrorHandler
-            }
-            if (e is IllegalStateException) {
-                // that's a bug in RxJava or in a custom operator
-                Thread.currentThread().uncaughtExceptionHandler
-                        .uncaughtException(Thread.currentThread(), e)
-                return@setErrorHandler
-            }
-            Log.w("Undeliverable", e)
+        }
+
+        override fun onLowMemory() {
+            Timber.d("onLowMemory")
+
+            Glide.get(app).clearMemory()
         }
     }
 }
