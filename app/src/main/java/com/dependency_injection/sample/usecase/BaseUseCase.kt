@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.dependency_injection.sample.datasource.dao.item
+package com.dependency_injection.sample.usecase
 
-import androidx.room.Dao
-import androidx.room.Query
-import com.dependency_injection.sample.datasource.dao.BaseDao
-import com.dependency_injection.sample.datasource.model.item.Item
+import androidx.lifecycle.LiveData
+import kotlinx.coroutines.CoroutineScope
 
-@Dao
-interface ItemDao : BaseDao<Item> {
-    @Query("SELECT * FROM Items")
-    fun getAssets(): List<Item>
-
-    @Query("DELETE FROM Items")
-    suspend fun clear()
+/**
+ * Executes business logic in its execute method and keep posting updates to the result as
+ * [Result<R>].
+ */
+abstract class BaseUseCase<in P, T> {
+    abstract suspend fun execute(viewModelScope: CoroutineScope, parameters: P): LiveData<T>
 }

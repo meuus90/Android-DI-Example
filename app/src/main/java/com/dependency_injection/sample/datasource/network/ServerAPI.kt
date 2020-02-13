@@ -20,8 +20,9 @@ import androidx.lifecycle.LiveData
 import com.dependency_injection.base.network.ApiResponse
 import com.dependency_injection.sample.datasource.model.item.Item
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface ServerAPI {
-    @GET("v1/items")
-    fun getItems(): LiveData<ApiResponse<Item>>
+    @GET("search")
+    fun getItems(@Query("part") part: String): LiveData<ApiResponse<MutableList<Item>>>
 }

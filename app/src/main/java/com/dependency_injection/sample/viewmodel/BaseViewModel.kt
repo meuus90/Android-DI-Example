@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package com.dependency_injection.sample.datasource.dao.item
+package com.dependency_injection.sample.viewmodel
 
-import androidx.room.Dao
-import androidx.room.Query
-import com.dependency_injection.sample.datasource.dao.BaseDao
-import com.dependency_injection.sample.datasource.model.item.Item
+import androidx.lifecycle.ViewModel
 
-@Dao
-interface ItemDao : BaseDao<Item> {
-    @Query("SELECT * FROM Items")
-    fun getAssets(): List<Item>
-
-    @Query("DELETE FROM Items")
-    suspend fun clear()
+abstract class BaseViewModel<in P, T> : ViewModel() {
+    abstract fun pullTrigger(params: P)
 }

@@ -74,21 +74,21 @@ android {
         prod {
             dimension "default"
             manifestPlaceholders = [appNameGradle: "Shareable Asset"]
-            buildConfigField "String", "apiServer", "\"https://google.com/api/\""
+            buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
 
         stg {
             dimension "default"
             applicationIdSuffix = ".stg"
             manifestPlaceholders = [appNameGradle: "Shareable Asset"]
-            buildConfigField "String", "apiServer", "\"https://stg.google.com/api/\""
+            buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
 
         dev {
             dimension "default"
             applicationIdSuffix = ".dev"
             manifestPlaceholders = [appNameGradle: "SADev"]
-            buildConfigField "String", "apiServer", "\"https://dev.google.com/api/\""
+            buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
     }
 
