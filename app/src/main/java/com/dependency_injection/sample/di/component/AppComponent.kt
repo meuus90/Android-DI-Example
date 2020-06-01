@@ -17,7 +17,7 @@
 package com.dependency_injection.sample.di.component
 
 import android.app.Application
-import com.dependency_injection.sample.AppApplication
+import com.dependency_injection.sample.SampleApplication
 import com.dependency_injection.sample.di.module.AppModule
 import com.dependency_injection.sample.di.module.activity.MainActivityModule
 import dagger.BindsInstance
@@ -40,5 +40,5 @@ interface AppComponent {
         fun create(@BindsInstance app: Application): AppComponent
     }
 
-    fun inject(app: AppApplication)
+    fun inject(app: SampleApplication)
 }

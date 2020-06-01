@@ -11,10 +11,10 @@ import androidx.camera.core.CameraXConfig
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.multidex.BuildConfig
 import androidx.multidex.MultiDex
 import com.bumptech.glide.Glide
 import com.dependency_injection.sample.di.helper.AppInjector
-import com.example.demo.BuildConfig
 import com.facebook.stetho.Stetho
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
@@ -26,7 +26,7 @@ import javax.inject.Inject
 import kotlin.system.exitProcess
 
 
-class AppApplication : Application(), CameraXConfig.Provider, LifecycleObserver, HasAndroidInjector {
+class SampleApplication : Application(), CameraXConfig.Provider, LifecycleObserver, HasAndroidInjector {
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
@@ -71,7 +71,7 @@ class AppApplication : Application(), CameraXConfig.Provider, LifecycleObserver,
 
     override fun androidInjector() = dispatchingAndroidInjector
 
-    class ShareableAssetComponentCallback(private val app: AppApplication) : ComponentCallbacks2 {
+    class ShareableAssetComponentCallback(private val app: SampleApplication) : ComponentCallbacks2 {
         override fun onConfigurationChanged(newConfig: Configuration?) {}
 
         override fun onTrimMemory(level: Int) {

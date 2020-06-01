@@ -22,7 +22,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
-import com.dependency_injection.sample.AppApplication
+import com.dependency_injection.sample.SampleApplication
 import com.dependency_injection.sample.di.Injectable
 import com.dependency_injection.sample.di.component.DaggerAppComponent
 import dagger.android.AndroidInjection
@@ -30,7 +30,7 @@ import dagger.android.HasAndroidInjector
 import dagger.android.support.AndroidSupportInjection
 
 object AppInjector {
-    fun init(app: AppApplication) {
+    fun init(app: SampleApplication) {
         DaggerAppComponent.factory().create(app).inject(app)
         app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
