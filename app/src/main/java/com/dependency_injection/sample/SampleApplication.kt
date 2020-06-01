@@ -71,7 +71,7 @@ class SampleApplication : Application(), CameraXConfig.Provider, LifecycleObserv
 
     override fun androidInjector() = dispatchingAndroidInjector
 
-    class ShareableAssetComponentCallback(private val app: SampleApplication) : ComponentCallbacks2 {
+    class SampleAppComponentCallback(private val app: SampleApplication) : ComponentCallbacks2 {
         override fun onConfigurationChanged(newConfig: Configuration?) {}
 
         override fun onTrimMemory(level: Int) {

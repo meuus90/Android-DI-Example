@@ -73,21 +73,21 @@ android {
     productFlavors {
         prod {
             dimension "default"
-            manifestPlaceholders = [appNameGradle: "Shareable Asset"]
+            manifestPlaceholders = [appNameGradle: "DI Sample"]
             buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
 
         stg {
             dimension "default"
             applicationIdSuffix = ".stg"
-            manifestPlaceholders = [appNameGradle: "Shareable Asset"]
+            manifestPlaceholders = [appNameGradle: "DI Sample stg"]
             buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
 
         dev {
             dimension "default"
             applicationIdSuffix = ".dev"
-            manifestPlaceholders = [appNameGradle: "SADev"]
+            manifestPlaceholders = [appNameGradle: "DI Sample dev"]
             buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
     }
@@ -104,8 +104,6 @@ android {
             includeAndroidResources = true
         }
     }
-
-    buildToolsVersion = '29.0.2'
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         sourceCompatibility = JavaVersion.VERSION_1_8
