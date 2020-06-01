@@ -77,17 +77,17 @@ android {
             buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
 
-        stg {
+        dev {
             dimension "default"
-            applicationIdSuffix = ".stg"
+            applicationIdSuffix = ".dev"
             manifestPlaceholders = [appNameGradle: "DI Sample stg"]
             buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
 
-        dev {
+        mock {
             dimension "default"
-            applicationIdSuffix = ".dev"
-            manifestPlaceholders = [appNameGradle: "DI Sample dev"]
+            applicationIdSuffix = ".mock"
+            manifestPlaceholders = [appNameGradle: "DI Sample mock"]
             buildConfigField "String", "apiServer", "\"https://www.googleapis.com/youtube/v3/\""
         }
     }
